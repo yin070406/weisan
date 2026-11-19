@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notice, Give, Connect — Positive Psychology Interactive Reflection</title>
+  <style>
+    :root {
+      --blue-deep: #153152;
+      --blue-mid: #254e7d;
+      --blue-soft: #eaf1f8;
+      --blue-border: #b8cde2;
+      --gold-rich: #b97d0e;
+      --gold-warm: #f2be49;
+      --gold-soft: #fff7df;
+      --gold-border: #e4c067;
+      --cream-bg: #fcf8ee;
+      --cream-card: #fffdf8;
+      --text-main: #132238;
+      --text-muted: #42566e;
+      --success-bg: #edf7f1;
+      --success-border: #3c8d62;
+      --success-text: #184d32;
+      --warn-bg: #fff3e4;
+      --warn-border: #cf7a24;
+      --warn-text: #6b3705;
+      --radius: 16px;
+      --shadow: 0 10px 28px rgba(21, 49, 82, 0.09);
+      --score-pct: 0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--text-main);
+      background: linear-gradient(180deg, #e9f0f8 0%, var(--cream-bg) 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.35s ease;
+    }
+
+    body[data-stage="intro"] {
+      background: radial-gradient(circle at top right, #fff5d9 0%, transparent 40%),
+                  linear-gradient(180deg, #e9f0f8 0%, var(--cream-bg) 100%);
+    }
+    body[data-stage="stage1"] {
+      background: radial-gradient(circle at 12% 15%, #fff3cf 0%, transparent 36%),
+                  radial-gradient(circle at 90% 80%, #dce9f7 0%, transparent 40%),
+                  linear-gradient(180deg, #eaf1f8 0%, #fcf8ed 100%);
+    }
+    body[data-stage="stage2"] {
+      background: radial-gradient(circle at 88% 15%, #dceaf8 0%, transparent 38%),
+                  radial-gradient(circle at 10% 85%, #fff2cc 0%, transparent 38%),
+                  linear-gradient(180deg, #edf3fa 0%, #faf6e8 100%);
+    }
+    body[data-stage="stage3"] {
+      background: radial-gradient(circle at 15% 20%, #e1edf9 0%, transparent 38%),
+                  radial-gradient(circle at 85% 75%, #ffeec2 0%, transparent 38%),
+                  linear-gradient(180deg, #eaf0f8 0%, #fcf7ea 100%);
+    }
+    body[data-stage="results"] {
+      background: radial-gradient(circle at 50% 10%, #ffefc7 0%, transparent 45%),
+                  linear-gradient(180deg, #e7eff8 0%, var(--cream-bg) 100%);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 18px 14px 36px;
+      flex: 1;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .game-header {
+      background: var(--blue-deep);
+      color: #ffffff;
+      padding: 18px 20px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      border-bottom: 5px solid var(--gold-warm);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .header-title-wrap { flex: 1 1 240px; min-width: 0; }
+    .game-title { margin: 0 0 4px; font-size: 1.55rem; line-height: 1.25; }
+    .game-subtitle { margin: 0; font-size: 0.96rem; color: #dce8f5; }
+
+    .score-panel {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(242, 190, 73, 0.55);
+      border-radius: 12px;
+      padding: 8px 14px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .score-ring {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: conic-gradient(var(--gold-warm) calc(var(--score-pct) * 1%), rgba(255, 255, 255, 0.2) 0);
+      display: grid;
+      place-items: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .score-ring::after {
+      content: "";
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--blue-deep);
+    }
+    .score-ring-num {
+      position: absolute;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--gold-soft);
+      z-index: 1;
+    }
+
+    .score-info { display: flex; flex-direction: column; line-height: 1.25; }
+    .score-text { font-size: 1rem; font-weight: 700; color: #ffffff; white-space: nowrap; }
+    .score-note { font-size: 0.76rem; color: #dce8f5; margin-top: 2px; }
+
+    .score-panel.score-bump { animation: scorePop 0.4s ease; }
+    @keyframes scorePop {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.06); background: rgba(242, 190, 73, 0.28); }
+      100% { transform: scale(1); }
+    }
+
+    .progress-wrap { margin-top: 14px; }
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.92rem;
+      margin-bottom: 6px;
+      color: var(--gold-soft);
+      font-weight: 600;
+      gap: 8px;
+    }
+    .progress-track {
+      width: 100%;
+      height: 11px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--gold-warm), #ffe08a);
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    .journey-map {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      background: var(--cream-card);
+      border: 1px solid var(--blue-border);
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(21, 49, 82, 0.05);
+    }
+    .journey-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 6px 8px;
+      border-radius: 10px;
+      color: var(--text-muted);
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .journey-step.is-active {
+      background: var(--gold-soft);
+      color: var(--blue-deep);
+      font-weight: 700;
+      border: 1px solid var(--gold-border);
+    }
+    .journey-step.is-done {
+      background: var(--blue-soft);
+      color: var(--blue-deep);
+      font-weight: 600;
+    }
+    .journey-connector {
+      height: 2px;
+      width: 18px;
+      background: var(--blue-border);
+      flex-shrink: 0;
+    }
+
+    .stage-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--blue-soft);
+      border: 2px solid var(--blue-mid);
+      position: relative;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+    .journey-step.is-active .stage-icon { background: var(--gold-warm); border-color: var(--gold-rich); }
+    .journey-step.is-done .stage-icon { background: var(--blue-deep); border-color: var(--blue-deep); }
+
+    .icon-notice::before {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--blue-deep);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .journey-step.is-done .icon-notice::before { background: var(--gold-warm); }
+
+    .icon-give::before {
+      content: "";
+      position: absolute;
+      width: 2px;
+      height: 8px;
+      background: var(--blue-deep);
+      top: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .icon-give::after {
+      content: "";
+      position: absolute;
+      width: 7px;
+      height: 2px;
+      background: var(--blue-deep);
+      top: 50%;
+      left: 50%;
+    }
+    .journey-step.is-done .icon-give::before,
+    .journey-step.is-done .icon-give::after { background: var(--gold-warm); }
+
+    .icon-connect::before,
+    .icon-connect::after {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--blue-deep);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .icon-connect::before { left: 5px; }
+    .icon-connect::after { right: 5px; }
+    .journey-step.is-done .icon-connect::before,
+    .journey-step.is-done .icon-connect::after { border-color: var(--gold-warm); }
+
+    .journey-label { font-size: 0.88rem; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; }
+
+    .card {
+      background: var(--cream-card);
+      border-radius: var(--radius);
+      padding: 26px 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--blue-border);
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeSlide 0.28s ease; }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 { margin: 0 0 12px; font-size: 1.42rem; color: var(--blue-deep); }
+    h3 { margin: 18px 0 10px; font-size: 1.12rem; color: var(--blue-mid); }
+    p { margin: 0 0 14px; }
+
+    .stage-badge {
+      display: inline-block;
+      background: var(--gold-soft);
+      color: #664300;
+      border: 1px solid var(--gold-border);
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    .scenario-box {
+      background: var(--blue-soft);
+      border-left: 5px solid var(--blue-mid);
+      padding: 15px 17px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+    }
+    .deadline-list { margin: 8px 0 0; padding-left: 20px; }
+    .deadline-list li { margin-bottom: 4px; }
+
+    .dialogue-block {
+      background: #ffffff;
+      border: 1px solid var(--blue-border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 10px rgba(21, 49, 82, 0.04);
+    }
+
+    .character-row { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+    .avatar-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-mid), var(--blue-deep));
+      border: 3px solid var(--gold-warm);
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .avatar-circle::before {
+      content: "";
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--gold-soft);
+      top: 9px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .avatar-circle::after {
+      content: "";
+      position: absolute;
+      width: 26px;
+      height: 16px;
+      border-radius: 14px 14px 0 0;
+      background: var(--gold-soft);
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .avatar-circle.alt {
+      background: linear-gradient(135deg, #2d5f94, #1b3d63);
+      border-color: #f4cc6a;
+    }
+
+    .speech-bubble {
+      position: relative;
+      background: var(--blue-soft);
+      border: 1px solid var(--blue-border);
+      border-radius: 14px;
+      padding: 12px 16px;
+      flex: 1;
+      min-width: 0;
+    }
+    .speech-bubble::before {
+      content: "";
+      position: absolute;
+      top: 14px;
+      left: -9px;
+      width: 14px;
+      height: 14px;
+      background: var(--blue-soft);
+      border-left: 1px solid var(--blue-border);
+      border-bottom: 1px solid var(--blue-border);
+      transform: rotate(45deg);
+    }
+    .speaker-role {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--blue-mid);
+      margin-bottom: 3px;
+    }
+    .speech-text { margin: 0; font-size: 1rem; color: var(--text-main); }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+      margin: 14px 0;
+    }
+    .choice-stack { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+
+    button { font-family: inherit; font-size: 1rem; cursor: pointer; }
+    button:focus-visible { outline: 3px solid var(--gold-rich); outline-offset: 2px; }
+
+    .choice-btn {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      text-align: left;
+      padding: 13px 15px;
+      border-radius: 12px;
+      border: 2px solid var(--blue-border);
+      background: #ffffff;
+      color: var(--text-main);
+      line-height: 1.45;
+      min-height: 50px;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .choice-btn:hover { background: var(--blue-soft); border-color: var(--blue-mid); }
+
+    .choice-key {
+      display: inline-grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--blue-soft);
+      border: 1px solid var(--blue-border);
+      color: var(--blue-deep);
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .choice-btn[aria-pressed="true"] {
+      background: var(--gold-soft);
+      border-color: var(--gold-rich);
+      box-shadow: inset 0 0 0 1px var(--gold-rich);
+      font-weight: 600;
+    }
+    .choice-btn[aria-pressed="true"] .choice-key {
+      background: var(--gold-warm);
+      border-color: var(--gold-rich);
+      color: var(--text-main);
+    }
+
+    .choice-btn.is-correct-selected {
+      background: var(--success-bg);
+      border-color: var(--success-border);
+      box-shadow: inset 0 0 0 1px var(--success-border);
+      font-weight: 600;
+    }
+    .choice-btn.is-correct-selected .choice-key {
+      background: var(--success-border);
+      border-color: var(--success-border);
+      color: #ffffff;
+    }
+
+    .choice-btn.is-wrong-selected {
+      background: var(--warn-bg);
+      border-color: var(--warn-border);
+      box-shadow: inset 0 0 0 1px var(--warn-border);
+    }
+    .choice-btn.is-wrong-selected .choice-key {
+      background: var(--warn-border);
+      border-color: var(--warn-border);
+      color: #ffffff;
+    }
+
+    .feedback-box {
+      margin-top: 12px;
+      padding: 13px 15px;
+      border-radius: 10px;
+      border: 1px solid var(--blue-border);
+      background: #f8fafd;
+      color: var(--text-main);
+      min-height: 52px;
+      font-size: 0.96rem;
+    }
+    .feedback-box.success { background: var(--success-bg); border-color: var(--success-border); color: var(--success-text); }
+    .feedback-box.warning { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-text); }
+
+    .activity-compare { display: grid; grid-template-columns: 1fr; gap: 14px; margin: 16px 0 20px; }
+    @media (min-width: 680px) { .activity-compare { grid-template-columns: 1fr 1fr; } }
+
+    .activity-panel {
+      border: 1px solid var(--blue-border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      background: #fafcff;
+    }
+    .activity-panel.improved { background: var(--gold-soft); border-color: var(--gold-border); }
+    .panel-label {
+      font-size: 0.84rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--blue-mid);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .celebration-banner {
+      display: none;
+      margin-top: 16px;
+      padding: 13px 16px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, var(--gold-soft), #eef5fc);
+      border: 2px solid var(--gold-warm);
+      color: var(--blue-deep);
+      font-weight: 600;
+      align-items: center;
+      gap: 10px;
+    }
+    .celebration-banner.visible { display: flex; animation: gentleArrive 0.35s ease; }
+    @keyframes gentleArrive {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .celebration-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--gold-rich); flex-shrink: 0; }
+
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--blue-border);
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--blue-deep);
+      color: #ffffff;
+      border: 2px solid var(--blue-deep);
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-weight: 700;
+      min-height: 48px;
+      transition: background 0.15s ease;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--blue-mid); border-color: var(--blue-mid); }
+    .btn-primary:disabled { background: #9fb0c4; border-color: #9fb0c4; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--blue-deep);
+      border: 2px solid var(--blue-mid);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      min-height: 48px;
+    }
+    .btn-secondary:hover { background: var(--blue-soft); }
+
+    .btn-gold {
+      background: var(--gold-warm);
+      color: var(--text-main);
+      border: 2px solid var(--gold-rich);
+      padding: 13px 26px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1.04rem;
+      min-height: 48px;
+    }
+    .btn-gold:hover { background: #f7ca63; }
+
+    .results-hero {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 20px;
+      background: linear-gradient(135deg, var(--blue-deep), var(--blue-mid));
+      color: #ffffff;
+      border-radius: 14px;
+      padding: 22px;
+      border-bottom: 5px solid var(--gold-warm);
+      margin-bottom: 20px;
+    }
+    .css-badge {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffe69a, var(--gold-warm) 65%, var(--gold-rich) 100%);
+      border: 4px solid #ffffff;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--blue-deep);
+      flex-shrink: 0;
+    }
+    .css-badge-score { font-size: 1.45rem; font-weight: 800; line-height: 1.1; }
+    .css-badge-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .results-summary { flex: 1 1 220px; min-width: 0; }
+    .results-category { margin: 0 0 6px; font-size: 1.4rem; color: var(--gold-soft); }
+    .results-metrics { margin: 0 0 8px; font-weight: 700; font-size: 1.05rem; }
+
+    .reflection-quote {
+      background: var(--gold-soft);
+      color: var(--blue-deep);
+      padding: 18px 20px;
+      border-radius: 12px;
+      border-left: 6px solid var(--gold-rich);
+      font-size: 1.08rem;
+      line-height: 1.6;
+      margin: 16px 0;
+      display: none;
+    }
+    .reflection-quote.visible { display: block; animation: fadeSlide 0.3s ease; }
+
+    .disclaimer-note {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      background: var(--blue-soft);
+      border: 1px solid var(--blue-border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin-top: 14px;
+    }
+
+    .counter-pill {
+      display: inline-block;
+      background: var(--blue-soft);
+      color: var(--blue-deep);
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.92rem;
+      margin-bottom: 8px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 16px 14px 28px;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 540px) {
+      body { font-size: 16.5px; }
+      .card { padding: 18px 14px; }
+      .game-header { padding: 14px; }
+      .journey-map { padding: 10px 8px; }
+      .journey-label { font-size: 0.76rem; }
+      .stage-icon { width: 26px; height: 26px; }
+      .journey-connector { width: 8px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body data-stage="intro">
+  <div class="container">
+    <header class="game-header">
+      <div class="header-top">
+        <div class="header-title-wrap">
+          <h1 class="game-title">Notice, Give, Connect</h1>
+          <p class="game-subtitle">Positive Psychology Portfolio Activity · Approximately 3–5 minutes</p>
+        </div>
+
+        <div class="score-panel" id="score-panel" aria-label="Current score">
+          <div class="score-ring" id="score-ring" aria-hidden="true">
+            <span class="score-ring-num" id="score-ring-num">0</span>
+          </div>
+          <div class="score-info">
+            <span class="score-text" id="score-display">Score: 0 / 100</span>
+            <span class="score-note">Educational score, not a psychological assessment.</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="score-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+      <div class="progress-wrap" aria-label="Activity progress">
+        <div class="progress-meta">
+          <span id="progress-label">Introduction</span>
+          <span id="progress-percent">0%</span>
+        </div>
+        <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="journey-map" aria-label="Three-stage journey">
+      <div class="journey-step" id="jstep-1">
+        <span class="stage-icon icon-notice" aria-hidden="true"></span>
+        <span class="journey-label">1. Notice</span>
+      </div>
+      <div class="journey-connector" aria-hidden="true"></div>
+      <div class="journey-step" id="jstep-2">
+        <span class="stage-icon icon-give" aria-hidden="true"></span>
+        <span class="journey-label">2. Give</span>
+      </div>
+      <div class="journey-connector" aria-hidden="true"></div>
+      <div class="journey-step" id="jstep-3">
+        <span class="stage-icon icon-connect" aria-hidden="true"></span>
+        <span class="journey-label">3. Connect</span>
+      </div>
+    </nav>
+
+    <main class="card">
+      <!-- INTRO SCREEN -->
+      <section id="screen-intro" class="screen active" aria-labelledby="intro-heading">
+        <span class="stage-badge">Welcome</span>
+        <h2 id="intro-heading" tabindex="-1">Three Positive Psychology Interventions</h2>
+        <p>
+          Positive psychology does not remove every difficulty. Instead, it offers practical ways to notice positive experiences alongside stress, adapt support for others, and respond with care and clear boundaries.
+        </p>
+        <p>
+          Choose the response that best reflects balanced, adaptable and respectful support. You may retry an answer, but the score may reflect the number of attempts.
+        </p>
+        <div class="scenario-box">
+          <strong>Activity Overview (100 Points Total):</strong>
+          <ul class="deadline-list">
+            <li><strong>Stage 1 — Three Blessings (25 points):</strong> Respond to a student facing deadlines and notice three positive moments alongside stress.</li>
+            <li><strong>Stage 2 — Gift of Time (25 points):</strong> Adapt a card-sequencing learning game and reflect on pressure-free giving.</li>
+            <li><strong>Stage 3 — Random Acts of Kindness (50 points):</strong> Navigate five everyday situations respecting consent, privacy, and academic integrity.</li>
+          </ul>
+        </div>
+        <button type="button" class="btn-gold" id="btn-start">Start Activity</button>
+      </section>
+
+      <!-- STAGE 1: THREE BLESSINGS (25 PTS) -->
+      <section id="screen-stage1" class="screen" aria-labelledby="stage1-heading">
+        <span class="stage-badge">Stage 1 of 3 · Notice (25 points)</span>
+        <h2 id="stage1-heading" tabindex="-1">Three Blessings Alongside Stress</h2>
+
+        <div class="scenario-box">
+          <strong>Context:</strong> Multiple academic deadlines are due this week—an essay draft, presentation slides, and weekly reading notes. The stress is real.
+        </div>
+
+        <div class="dialogue-block">
+          <h3>Part A: Respond to the Student (10 points)</h3>
+          <div class="character-row">
+            <div class="avatar-circle" aria-hidden="true"></div>
+            <div class="speech-bubble">
+              <span class="speaker-role">Fictional Student</span>
+              <p class="speech-text">“I still have many unfinished tasks. Writing positive experiences seems pointless because the pressure is still here.”</p>
+            </div>
+          </div>
+
+          <div class="choice-stack" id="s1-dialogue-choices" role="group" aria-label="Respond to the fictional student">
+            <button type="button" class="choice-btn" data-opt="A"><span class="choice-key">A</span><span>“Ignore the pressure and think only about happy things.”</span></button>
+            <button type="button" class="choice-btn" data-opt="B"><span class="choice-key">B</span><span>“Positive experiences and academic pressure can exist at the same time.”</span></button>
+            <button type="button" class="choice-btn" data-opt="C"><span class="choice-key">C</span><span>“Three Blessings will remove the deadlines.”</span></button>
+          </div>
+          <div id="s1-dialogue-fb" class="feedback-box" aria-live="polite">Choose a dialogue response above.</div>
+        </div>
+
+        <div class="dialogue-block">
+          <h3>Part B: Select Three Positive Experiences (15 points)</h3>
+          <p>Select <strong>three</strong> suitable positive moments that can exist alongside ongoing deadlines (5 points each, up to 15 points).</p>
+          <div class="counter-pill" id="s1-counter">Selected: 0 of 3</div>
+
+          <div class="choice-grid" id="s1-card-choices" role="group" aria-label="Select three suitable positive experiences">
+            <button type="button" class="choice-btn" data-id="assignment" data-valid="true" aria-pressed="false"><span class="choice-key">1</span><span>Completing part of an assignment</span></button>
+            <button type="button" class="choice-btn" data-id="dogs" data-valid="true" aria-pressed="false"><span class="choice-key">2</span><span>Playing with dogs</span></button>
+            <button type="button" class="choice-btn" data-id="ignore" data-valid="false" aria-pressed="false"><span class="choice-key">3</span><span>Pretending the deadlines do not exist</span></button>
+            <button type="button" class="choice-btn" data-id="friend" data-valid="true" aria-pressed="false"><span class="choice-key">4</span><span>Eating with a friend</span></button>
+            <button type="button" class="choice-btn" data-id="sunset" data-valid="true" aria-pressed="false"><span class="choice-key">5</span><span>Watching a sunset</span></button>
+            <button type="button" class="choice-btn" data-id="wait" data-valid="false" aria-pressed="false"><span class="choice-key">6</span><span>Waiting until all stress disappears first</span></button>
+          </div>
+          <div id="s1-cards-fb" class="feedback-box" aria-live="polite">Select three suitable positive experiences above.</div>
+        </div>
+
+        <div class="celebration-banner" id="s1-celebration" aria-live="polite">
+          <span class="celebration-dot" aria-hidden="true"></span>
+          <span>Stage 1 complete! You recognised how positive experiences can coexist with ongoing stress.</span>
+        </div>
+
+        <div class="nav-bar">
+          <button type="button" class="btn-secondary" id="s1-back">Back</button>
+          <button type="button" class="btn-primary" id="s1-next" disabled>Next: Gift of Time</button>
+        </div>
+      </section>
+
+      <!-- STAGE 2: GIFT OF TIME (25 PTS) -->
+      <section id="screen-stage2" class="screen" aria-labelledby="stage2-heading">
+        <span class="stage-badge">Stage 2 of 3 · Give (25 points)</span>
+        <h2 id="stage2-heading" tabindex="-1">Gift of Time: Adapting Support</h2>
+
+        <div class="dialogue-block">
+          <h3>Part A: Adapting a Learning Game (15 points)</h3>
+          <div class="character-row">
+            <div class="avatar-circle alt" aria-hidden="true"></div>
+            <div class="speech-bubble">
+              <span class="speaker-role">Fictional Learner</span>
+              <p class="speech-text">“I do not understand the instructions. There are too many steps.”</p>
+            </div>
+          </div>
+
+          <div class="choice-stack" id="s2-d1-choices" role="group" aria-label="Respond to the fictional learner">
+            <button type="button" class="choice-btn" data-opt="A"><span class="choice-key">A</span><span>Repeat the same long explanation more loudly.</span></button>
+            <button type="button" class="choice-btn" data-opt="B"><span class="choice-key">B</span><span>End the activity immediately.</span></button>
+            <button type="button" class="choice-btn" data-opt="C"><span class="choice-key">C</span><span>Use fewer steps, demonstrate the game and check understanding.</span></button>
+          </div>
+          <div id="s2-d1-fb" class="feedback-box" aria-live="polite">Choose how to respond to the learner.</div>
+        </div>
+
+        <div class="activity-compare">
+          <div class="activity-panel">
+            <span class="panel-label">Before: Too Complicated</span>
+            <p style="font-size: 0.94rem; margin-bottom: 0;">
+              <strong>Card-Sequencing Game:</strong> “Sort all 18 word cards into chronological, causal, and thematic sets simultaneously, justify each link aloud before placing the next card, and revise all three rows without hints.”
+            </p>
+          </div>
+          <div class="activity-panel improved">
+            <span class="panel-label">After: Adapted Support</span>
+            <p style="font-size: 0.94rem; margin-bottom: 0;">
+              <strong>Card-Sequencing Game:</strong> Start with 4 cards. Show one example order first, ask the learner to place the next card, and check understanding together.
+            </p>
+          </div>
+        </div>
+
+        <div class="dialogue-block">
+          <h3>Part B: Reflection on Effort and Gratitude (10 points)</h3>
+          <div class="character-row">
+            <div class="avatar-circle" aria-hidden="true"></div>
+            <div class="speech-bubble">
+              <span class="speaker-role">Reflection Question</span>
+              <p class="speech-text">“You spent several hours preparing. Should you tell the recipient the exact time so the recipient feels grateful?”</p>
+            </div>
+          </div>
+
+          <div class="choice-stack" id="s2-d2-choices" role="group" aria-label="Answer the reflection question">
+            <button type="button" class="choice-btn" data-opt="A"><span class="choice-key">A</span><span>Yes, because the recipient should appreciate the effort.</span></button>
+            <button type="button" class="choice-btn" data-opt="B"><span class="choice-key">B</span><span>No, because this could create pressure or obligation.</span></button>
+            <button type="button" class="choice-btn" data-opt="C"><span class="choice-key">C</span><span>Yes, and ask the recipient to repay the effort.</span></button>
+          </div>
+          <div id="s2-d2-fb" class="feedback-box" aria-live="polite">Choose the response that reflects meaningful giving.</div>
+        </div>
+
+        <div class="celebration-banner" id="s2-celebration" aria-live="polite">
+          <span class="celebration-dot" aria-hidden="true"></span>
+          <span>Stage 2 complete! Meaningful support requires patience, creativity, and adaptability without creating obligation.</span>
+        </div>
+
+        <div class="nav-bar">
+          <button type="button" class="btn-secondary" id="s2-back">Back</button>
+          <button type="button" class="btn-primary" id="s2-next" disabled>Next: Random Acts of Kindness</button>
+        </div>
+      </section>
+
+      <!-- STAGE 3: RANDOM ACTS OF KINDNESS (50 PTS) -->
+      <section id="screen-stage3" class="screen" aria-labelledby="stage3-heading">
+        <span class="stage-badge">Stage 3 of 3 · Connect (50 points)</span>
+        <h2 id="stage3-heading" tabindex="-1">Random Acts of Kindness: Five Situations</h2>
+        <p>
+          Choose the most supportive response in each everyday situation while respecting <strong>consent</strong>, <strong>privacy</strong>, and <strong>academic integrity</strong> (10 points each on first attempt; 5 points if corrected).
+        </p>
+
+        <div class="dialogue-block" data-sit-block="0">
+          <h3>Situation 1: PivotChart Support (10 points)</h3>
+          <div class="character-row">
+            <div class="avatar-circle alt" aria-hidden="true"></div>
+            <div class="speech-bubble">
+              <span class="speaker-role">Classmate</span>
+              <p class="speech-text">“I am stuck trying to create a PivotChart for our individual spreadsheet task. Could you help me?”</p>
+            </div>
+          </div>
+          <div class="choice-stack" data-sit="0" role="group" aria-label="Situation 1: PivotChart support">
+            <button type="button" class="choice-btn" data-opt="A"><span class="choice-key">A</span><span>Complete the classmate’s assessed work.</span></button>
+            <button type="button" class="choice-btn" data-opt="B"><span class="choice-key">B</span><span>Explain the process and let the classmate complete the work.</span></button>
+            <button type="button" class="choice-btn" data-opt="C"><span class="choice-key">C</span><span>Send an answer with no explanation.</span></button>
+          </div>
+          <div id="s3-fb-0" class="feedback-box" aria-live="polite">Choose an option for Situation 1.</div>
+        </div>
+
+        <div class="dialogue-block" data-sit-block="1">
+          <h3>Situation 2: Giving Directions (10 points)</h3>
+          <div class="character-row">
+            <div class="avatar-circle" aria-hidden="true"></div>
+            <div class="speech-bubble">
+              <span class="speaker-role">Visitor</span>
+              <p class="speech-text">“Excuse me, how do I reach the seminar room on the other side of the building?”</p>
+            </div>
+          </div>
+          <div class="choice-stack" data-sit="1" role="group" aria-label="Situation 2: Giving directions">
+            <button type="button" class="choice-btn" data-opt="A"><span class="choice-key">A</span><span>Guess confidently.</span></button>
+            <button type="button" class="choice-btn" data-opt="B"><span class="choice-key">B</span><span>Ignore the person.</span></button>
+            <button type="button" class="choice-btn" data-opt="C"><span class="choice-key">C</span><span>Check a map before giving directions.</span></button>
+          </div>
+          <div id="s3-fb-1" class="feedback-box" aria-live="polite">Choose an option for Situation 2.</div>
+        </div>
+
+        <div class="dialogue-block" data-sit-block="2">
+          <h3>Situation 3: Holding a Door (10 points)</h3>
+          <div class="character-row">
+            <div class="avatar-circle alt" aria-hidden="true"></div>
+            <div class="speech-bubble">
+              <span class="speaker-role">Person Carrying Items</span>
+              <p class="speech-text">“I have several boxes stacked up here and my hands are full near the doorway.”</p>
+            </div>
+          </div>
+          <div class="choice-stack" data-sit="2" role="group" aria-label="Situation 3: Holding a door">
+            <button type="button" class="choice-btn" data-opt="A"><span class="choice-key">A</span><span>Offer help respectfully.</span></button>
+            <button type="button" class="choice-btn" data-opt="B"><span class="choice-key">B</span><span>Take the person’s belongings without permission.</span></button>
+            <button type="button" class="choice-btn" data-opt="C"><span class="choice-key">C</span><span>Assume the person cannot manage.</span></button>
+          </div>
+          <div id="s3-fb-2" class="feedback-box" aria-live="polite">Choose an option for Situation 3.</div>
+        </div>
+
+        <div class="dialogue-block" data-sit-block="3">
+          <h3>Situation 4: Presentation Encouragement (10 points)</h3>
+          <div class="character-row">
+            <div class="avatar-circle" aria-hidden="true"></div>
+            <div class="speech-bubble">
+              <span class="speaker-role">Friend</span>
+              <p class="speech-text">“My presentation starts in ten minutes. I am worried about how it will go.”</p>
+            </div>
+          </div>
+          <div class="choice-stack" data-sit="3" role="group" aria-label="Situation 4: Presentation encouragement">
+            <button type="button" class="choice-btn" data-opt="A"><span class="choice-key">A</span><span>Guarantee a high grade.</span></button>
+            <button type="button" class="choice-btn" data-opt="B"><span class="choice-key">B</span><span>Mention a genuine strength and provide realistic encouragement.</span></button>
+            <button type="button" class="choice-btn" data-opt="C"><span class="choice-key">C</span><span>Compare the friend negatively with another person.</span></button>
+          </div>
+          <div id="s3-fb-3" class="feedback-box" aria-live="polite">Choose an option for Situation 4.</div>
+        </div>
+
+        <div class="dialogue-block" data-sit-block="4">
+          <h3>Situation 5: Offering a Snack (10 points)</h3>
+          <div class="character-row">
+            <div class="avatar-circle alt" aria-hidden="true"></div>
+            <div class="speech-bubble">
+              <span class="speaker-role">Classmate</span>
+              <p class="speech-text">“We have a long study session ahead. Thanks for thinking of me, though I am not sure if I want anything right now.”</p>
+            </div>
+          </div>
+          <div class="choice-stack" data-sit="4" role="group" aria-label="Situation 5: Offering a snack">
+            <button type="button" class="choice-btn" data-opt="A"><span class="choice-key">A</span><span>Offer it without pressure and accept either response.</span></button>
+            <button type="button" class="choice-btn" data-opt="B"><span class="choice-key">B</span><span>Insist that the classmate accepts it.</span></button>
+            <button type="button" class="choice-btn" data-opt="C"><span class="choice-key">C</span><span>Expect something in return.</span></button>
+          </div>
+          <div id="s3-fb-4" class="feedback-box" aria-live="polite">Choose an option for Situation 5.</div>
+        </div>
+
+        <div class="celebration-banner" id="s3-celebration" aria-live="polite">
+          <span class="celebration-dot" aria-hidden="true"></span>
+          <span>Stage 3 complete! You practised kindness grounded in consent, accuracy, and respect.</span>
+        </div>
+
+        <div class="nav-bar">
+          <button type="button" class="btn-secondary" id="s3-back">Back</button>
+          <button type="button" class="btn-primary" id="s3-next" disabled>View Final Results</button>
+        </div>
+      </section>
+
+      <!-- FINAL RESULTS SCREEN -->
+      <section id="screen-results" class="screen" aria-labelledby="results-heading">
+        <span class="stage-badge">Activity Complete</span>
+        <h2 id="results-heading" tabindex="-1">Your Portfolio Results &amp; Reflection</h2>
+
+        <div class="results-hero">
+          <div class="css-badge" aria-hidden="true">
+            <span class="css-badge-score" id="badge-score-num">0</span>
+            <span class="css-badge-label">of 100</span>
+          </div>
+          <div class="results-summary">
+            <h3 class="results-category" id="results-category">Reflective Responder</h3>
+            <p class="results-metrics" id="results-metrics">Final Score: 0 / 100 (0%)</p>
+            <p id="results-feedback" style="margin-bottom: 0;"></p>
+          </div>
+        </div>
+
+        <div class="dialogue-block">
+          <h3>Select One Key Takeaway</h3>
+          <p>Choose the reflection statement that resonates most with your learning today:</p>
+          <div class="choice-stack" id="takeaway-choices" role="group" aria-label="Select one key takeaway">
+            <button type="button" class="choice-btn" data-takeaway="1" aria-pressed="false">
+              <span class="choice-key">1</span><span>“I can notice positive experiences without ignoring difficulties.”</span>
+            </button>
+            <button type="button" class="choice-btn" data-takeaway="2" aria-pressed="false">
+              <span class="choice-key">2</span><span>“Giving time requires adaptation, not only effort.”</span>
+            </button>
+            <button type="button" class="choice-btn" data-takeaway="3" aria-pressed="false">
+              <span class="choice-key">3</span><span>“Kindness should respect consent, privacy and boundaries.”</span>
+            </button>
+          </div>
+
+          <blockquote class="reflection-quote" id="final-reflection-quote" aria-live="polite">
+            “Positive psychology did not remove every difficulty. It helped me notice positive experiences, adapt to another person’s needs and recognise opportunities to support others.”
+          </blockquote>
+        </div>
+
+        <div class="disclaimer-note">
+          This result is for learning and reflection only. It is not a psychological assessment.
+        </div>
+
+        <div class="nav-bar">
+          <button type="button" class="btn-secondary" id="res-back">Back</button>
+          <button type="button" class="btn-gold" id="btn-restart">Restart Activity</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    AI-generated with Gemini on 19 November 2026 and reviewed by the student. This interactive visual is based on the student’s genuine Portfolio reflection and is not evidence of intervention completion.
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      let score = 0;
+
+      const state = {
+        s1Dialogue: { selected: null, hadWrong: false, points: 0 },
+        s1Cards: new Set(),
+        s2Dialogue1: { selected: null, hadWrong: false, points: 0 },
+        s2Dialogue2: { selected: null, hadWrong: false, points: 0 },
+        s3: [
+          { selected: null, hadWrong: false, points: 0 },
+          { selected: null, hadWrong: false, points: 0 },
+          { selected: null, hadWrong: false, points: 0 },
+          { selected: null, hadWrong: false, points: 0 },
+          { selected: null, hadWrong: false, points: 0 }
+        ],
+        takeaway: null
+      };
+
+      const scorePanel = document.getElementById("score-panel");
+      const scoreDisplay = document.getElementById("score-display");
+      const scoreRingNum = document.getElementById("score-ring-num");
+      const scoreLive = document.getElementById("score-live");
+
+      function updateScore(announce) {
+        const s1CardPts = Math.min(15, state.s1Cards.size * 5);
+        const s3Total = state.s3.reduce(function (sum, item) { return sum + item.points; }, 0);
+        const raw = state.s1Dialogue.points + s1CardPts + state.s2Dialogue1.points + state.s2Dialogue2.points + s3Total;
+        const nextScore = Math.max(0, Math.min(100, raw));
+        const changed = nextScore !== score;
+        score = nextScore;
+
+        scoreDisplay.textContent = "Score: " + score + " / 100";
+        scoreRingNum.textContent = String(score);
+        document.documentElement.style.setProperty("--score-pct", String(score));
+
+        if (changed && announce) {
+          scorePanel.classList.remove("score-bump");
+          void scorePanel.offsetWidth;
+          scorePanel.classList.add("score-bump");
+          scoreLive.textContent = "Score updated: " + score + " out of 100.";
+        }
+      }
+
+      const screens = {
+        intro: document.getElementById("screen-intro"),
+        stage1: document.getElementById("screen-stage1"),
+        stage2: document.getElementById("screen-stage2"),
+        stage3: document.getElementById("screen-stage3"),
+        results: document.getElementById("screen-results")
+      };
+
+      const progressLabel = document.getElementById("progress-label");
+      const progressPercent = document.getElementById("progress-percent");
+      const progressFill = document.getElementById("progress-fill");
+      const progressBar = document.getElementById("progress-bar");
+      const jsteps = [document.getElementById("jstep-1"), document.getElementById("jstep-2"), document.getElementById("jstep-3")];
+
+      const screenMeta = {
+        intro: { label: "Introduction", pct: 0, focusId: "intro-heading", activeStage: 0 },
+        stage1: { label: "Stage 1 of 3 · Three Blessings", pct: 25, focusId: "stage1-heading", activeStage: 1 },
+        stage2: { label: "Stage 2 of 3 · Gift of Time", pct: 55, focusId: "stage2-heading", activeStage: 2 },
+        stage3: { label: "Stage 3 of 3 · Random Acts of Kindness", pct: 85, focusId: "stage3-heading", activeStage: 3 },
+        results: { label: "Complete · Portfolio Results", pct: 100, focusId: "results-heading", activeStage: 4 }
+      };
+
+      function showScreen(name) {
+        Object.keys(screens).forEach(function (key) {
+          screens[key].classList.toggle("active", key === name);
+        });
+        document.body.setAttribute("data-stage", name);
+
+        const meta = screenMeta[name];
+        progressLabel.textContent = meta.label;
+        progressPercent.textContent = meta.pct + "%";
+        progressFill.style.width = meta.pct + "%";
+        progressBar.setAttribute("aria-valuenow", String(meta.pct));
+
+        jsteps.forEach(function (stepEl, idx) {
+          const stageNum = idx + 1;
+          stepEl.classList.toggle("is-active", meta.activeStage === stageNum);
+          stepEl.classList.toggle("is-done", meta.activeStage > stageNum);
+        });
+
+        if (name === "results") { renderResults(); }
+
+        const heading = document.getElementById(meta.focusId);
+        if (heading) { heading.focus(); }
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function handleSingleChoice(containerEl, stateObj, chosenOpt, correctOpt, firstPts, retryPts, fbEl, messages) {
+        if (stateObj.selected === chosenOpt) { return; }
+
+        const isCorrect = chosenOpt === correctOpt;
+        if (isCorrect) {
+          stateObj.selected = chosenOpt;
+          stateObj.points = stateObj.hadWrong ? retryPts : firstPts;
+          fbEl.className = "feedback-box success";
+        } else {
+          stateObj.hadWrong = true;
+          stateObj.selected = chosenOpt;
+          stateObj.points = 0;
+          fbEl.className = "feedback-box warning";
+        }
+        fbEl.textContent = messages[chosenOpt];
+
+        containerEl.querySelectorAll(".choice-btn").forEach(function (btn) {
+          const opt = btn.dataset.opt;
+          const isThis = opt === chosenOpt;
+          btn.setAttribute("aria-pressed", String(isThis));
+          btn.classList.toggle("is-correct-selected", isThis && isCorrect);
+          btn.classList.toggle("is-wrong-selected", isThis && !isCorrect);
+        });
+
+        updateScore(true);
+      }
+
+      const s1DialogueContainer = document.getElementById("s1-dialogue-choices");
+      const s1DialogueFb = document.getElementById("s1-dialogue-fb");
+      const s1DialogueMsgs = {
+        A: "Ignoring pressure is avoidance. Three Blessings does not remove practical stressors; it broadens attention to include positive experiences alongside difficulties.",
+        B: "Correct! Three Blessings does not remove practical stressors. It broadens attention to include positive experiences alongside difficulties.",
+        C: "Deadlines still remain. Three Blessings does not remove practical stressors; it helps broaden attention to notice positive moments alongside them."
+      };
+
+      const s1CardContainer = document.getElementById("s1-card-choices");
+      const s1CardsFb = document.getElementById("s1-cards-fb");
+      const s1Counter = document.getElementById("s1-counter");
+      const s1Next = document.getElementById("s1-next");
+      const s1Celebration = document.getElementById("s1-celebration");
+
+      const s1CardMsgs = {
+        assignment: "Completing part of an assignment recognises real progress while other deadlines remain.",
+        dogs: "Playing with dogs offers a brief, grounded positive moment alongside academic stress.",
+        friend: "Eating with a friend provides connection without pretending the workload has vanished.",
+        sunset: "Watching a sunset is a calm everyday moment that can coexist with pressure.",
+        ignore: "Pretending deadlines do not exist is avoidance rather than noticing a positive experience.",
+        wait: "Waiting until all stress disappears means overlooking everyday positive moments."
+      };
+
+      function checkStage1Complete() {
+        const done = state.s1Dialogue.selected !== null && state.s1Cards.size === 3;
+        s1Next.disabled = !done;
+        s1Celebration.classList.toggle("visible", state.s1Dialogue.selected === "B" && state.s1Cards.size === 3);
+      }
+
+      s1DialogueContainer.addEventListener("click", function (e) {
+        const btn = e.target.closest(".choice-btn");
+        if (!btn) return;
+        handleSingleChoice(s1DialogueContainer, state.s1Dialogue, btn.dataset.opt, "B", 10, 5, s1DialogueFb, s1DialogueMsgs);
+        checkStage1Complete();
+      });
+
+      s1CardContainer.addEventListener("click", function (e) {
+        const btn = e.target.closest(".choice-btn");
+        if (!btn) return;
+        const id = btn.dataset.id;
+        const isValid = btn.dataset.valid === "true";
+
+        if (!isValid) {
+          btn.classList.add("is-wrong-selected");
+          s1CardsFb.className = "feedback-box warning";
+          s1CardsFb.textContent = s1CardMsgs[id];
+          return;
+        }
+
+        if (state.s1Cards.has(id)) {
+          state.s1Cards.delete(id);
+          btn.setAttribute("aria-pressed", "false");
+          btn.classList.remove("is-correct-selected");
+          s1CardsFb.className = "feedback-box";
+          s1CardsFb.textContent = "Experience deselected. Choose three suitable positive moments.";
+        } else {
+          if (state.s1Cards.size >= 3) {
+            s1CardsFb.className = "feedback-box warning";
+            s1CardsFb.textContent = "Three experiences are already selected. Deselect one if you wish to swap it.";
+            return;
+          }
+          state.s1Cards.add(id);
+          btn.setAttribute("aria-pressed", "true");
+          btn.classList.add("is-correct-selected");
+          s1CardsFb.className = "feedback-box success";
+          s1CardsFb.textContent = s1CardMsgs[id];
+        }
+
+        s1Counter.textContent = "Selected: " + state.s1Cards.size + " of 3";
+        updateScore(true);
+        checkStage1Complete();
+      });
+
+      const s2D1Container = document.getElementById("s2-d1-choices");
+      const s2D1Fb = document.getElementById("s2-d1-fb");
+      const s2D1Msgs = {
+        A: "Repeating the same long explanation louder does not address why the steps feel overwhelming.",
+        B: "Ending the activity immediately gives up before adapting the task to the learner’s needs.",
+        C: "Correct! Using fewer steps, demonstrating the card-sequencing game, and checking understanding adapts support with patience and creativity."
+      };
+
+      const s2D2Container = document.getElementById("s2-d2-choices");
+      const s2D2Fb = document.getElementById("s2-d2-fb");
+      const s2D2Msgs = {
+        A: "Highlighting how many hours you spent can make the recipient feel pressured to show gratitude.",
+        B: "Correct! Meaningful giving should not pressure the recipient to show gratitude or feel obligated.",
+        C: "Asking the recipient to repay the effort turns support into a transaction rather than a gift."
+      };
+
+      const s2Next = document.getElementById("s2-next");
+      const s2Celebration = document.getElementById("s2-celebration");
+
+      function checkStage2Complete() {
+        const answeredBoth = state.s2Dialogue1.selected !== null && state.s2Dialogue2.selected !== null;
+        s2Next.disabled = !answeredBoth;
+        s2Celebration.classList.toggle("visible", state.s2Dialogue1.selected === "C" && state.s2Dialogue2.selected === "B");
+      }
+
+      s2D1Container.addEventListener("click", function (e) {
+        const btn = e.target.closest(".choice-btn");
+        if (!btn) return;
+        handleSingleChoice(s2D1Container, state.s2Dialogue1, btn.dataset.opt, "C", 15, 8, s2D1Fb, s2D1Msgs);
+        checkStage2Complete();
+      });
+
+      s2D2Container.addEventListener("click", function (e) {
+        const btn = e.target.closest(".choice-btn");
+        if (!btn) return;
+        handleSingleChoice(s2D2Container, state.s2Dialogue2, btn.dataset.opt, "B", 10, 5, s2D2Fb, s2D2Msgs);
+        checkStage2Complete();
+      });
+
+      const s3Config = [
+        {
+          correct: "B",
+          msgs: {
+            A: "Completing assessed work for a classmate violates academic integrity.",
+            B: "Correct! Explaining the PivotChart process supports learning while respecting academic integrity.",
+            C: "Sending an answer without explanation does not help the classmate learn the process."
+          }
+        },
+        {
+          correct: "C",
+          msgs: {
+            A: "Guessing confidently risks sending the visitor in the wrong direction.",
+            B: "Ignoring a simple request misses an easy opportunity to help.",
+            C: "Correct! Checking a map ensures your directions are accurate and genuinely helpful."
+          }
+        },
+        {
+          correct: "A",
+          msgs: {
+            A: "Correct! Offering help respectfully honours the person’s consent and autonomy.",
+            B: "Taking someone’s belongings without permission ignores personal boundaries and consent.",
+            C: "Assuming someone cannot manage removes their choice instead of offering respectful support."
+          }
+        },
+        {
+          correct: "B",
+          msgs: {
+            A: "Guaranteeing a high grade is unrealistic and may feel dismissive.",
+            B: "Correct! Specific, realistic encouragement acknowledges genuine strengths without false promises.",
+            C: "Comparing someone negatively with another person increases anxiety rather than offering support."
+          }
+        },
+        {
+          correct: "A",
+          msgs: {
+            A: "Correct! Offering without pressure and accepting either response respects consent and boundaries.",
+            B: "Insisting creates social pressure and disregards the classmate’s preference.",
+            C: "Expecting something in return turns a kind gesture into an obligation."
+          }
+        }
+      ];
+
+      const s3Next = document.getElementById("s3-next");
+      const s3Celebration = document.getElementById("s3-celebration");
+
+      function checkStage3Complete() {
+        s3Next.disabled = !state.s3.every(function (item) { return item.selected !== null; });
+        s3Celebration.classList.toggle("visible", state.s3.every(function (item, i) { return item.selected === s3Config[i].correct; }));
+      }
+
+      document.getElementById("screen-stage3").addEventListener("click", function (e) {
+        const btn = e.target.closest(".choice-btn");
+        if (!btn) return;
+        const stack = btn.closest(".choice-stack");
+        if (!stack || stack.dataset.sit === undefined) return;
+        const idx = Number(stack.dataset.sit);
+        handleSingleChoice(stack, state.s3[idx], btn.dataset.opt, s3Config[idx].correct, 10, 5, document.getElementById("s3-fb-" + idx), s3Config[idx].msgs);
+        checkStage3Complete();
+      });
+
+      const badgeScoreNum = document.getElementById("badge-score-num");
+      const resultsCategory = document.getElementById("results-category");
+      const resultsMetrics = document.getElementById("results-metrics");
+      const resultsFeedback = document.getElementById("results-feedback");
+      const takeawayChoices = document.getElementById("takeaway-choices");
+      const finalQuote = document.getElementById("final-reflection-quote");
+
+      function renderResults() {
+        const pct = Math.round((score / 100) * 100);
+        badgeScoreNum.textContent = String(score);
+        resultsMetrics.textContent = "Final Score: " + score + " / 100 (" + pct + "%)";
+
+        if (score >= 85) {
+          resultsCategory.textContent = "Reflective Responder";
+          resultsFeedback.textContent = "You consistently noticed positive experiences, adapted support and respected other people’s boundaries.";
+        } else if (score >= 65) {
+          resultsCategory.textContent = "Developing Awareness";
+          resultsFeedback.textContent = "You understood many key ideas. Review how consent, realistic expectations and adaptability influence positive actions.";
+        } else {
+          resultsCategory.textContent = "Reflection in Progress";
+          resultsFeedback.textContent = "Positive intentions are a starting point. Consider how actions can be accurate, respectful and responsive to another person’s needs.";
+        }
+      }
+
+      takeawayChoices.addEventListener("click", function (e) {
+        const btn = e.target.closest(".choice-btn");
+        if (!btn) return;
+        state.takeaway = btn.dataset.takeaway;
+        takeawayChoices.querySelectorAll(".choice-btn").forEach(function (b) {
+          b.setAttribute("aria-pressed", String(b.dataset.takeaway === state.takeaway));
+        });
+        finalQuote.classList.add("visible");
+      });
+
+      document.getElementById("btn-start").addEventListener("click", function () { showScreen("stage1"); });
+      document.getElementById("s1-back").addEventListener("click", function () { showScreen("intro"); });
+      document.getElementById("s1-next").addEventListener("click", function () { showScreen("stage2"); });
+      document.getElementById("s2-back").addEventListener("click", function () { showScreen("stage1"); });
+      document.getElementById("s2-next").addEventListener("click", function () { showScreen("stage3"); });
+      document.getElementById("s3-back").addEventListener("click", function () { showScreen("stage2"); });
+      document.getElementById("s3-next").addEventListener("click", function () { showScreen("results"); });
+      document.getElementById("res-back").addEventListener("click", function () { showScreen("stage3"); });
+
+      document.getElementById("btn-restart").addEventListener("click", function () {
+        state.s1Dialogue = { selected: null, hadWrong: false, points: 0 };
+        state.s1Cards.clear();
+        state.s2Dialogue1 = { selected: null, hadWrong: false, points: 0 };
+        state.s2Dialogue2 = { selected: null, hadWrong: false, points: 0 };
+        state.s3 = [
+          { selected: null, hadWrong: false, points: 0 },
+          { selected: null, hadWrong: false, points: 0 },
+          { selected: null, hadWrong: false, points: 0 },
+          { selected: null, hadWrong: false, points: 0 },
+          { selected: null, hadWrong: false, points: 0 }
+        ];
+        state.takeaway = null;
+
+        document.querySelectorAll(".choice-btn").forEach(function (btn) {
+          btn.setAttribute("aria-pressed", "false");
+          btn.classList.remove("is-correct-selected", "is-wrong-selected");
+        });
+
+        s1DialogueFb.className = "feedback-box";
+        s1DialogueFb.textContent = "Choose a dialogue response above.";
+        s1Counter.textContent = "Selected: 0 of 3";
+        s1CardsFb.className = "feedback-box";
+        s1CardsFb.textContent = "Select three suitable positive experiences above.";
+        s1Next.disabled = true;
+        s1Celebration.classList.remove("visible");
+
+        s2D1Fb.className = "feedback-box";
+        s2D1Fb.textContent = "Choose how to respond to the learner.";
+        s2D2Fb.className = "feedback-box";
+        s2D2Fb.textContent = "Choose the response that reflects meaningful giving.";
+        s2Next.disabled = true;
+        s2Celebration.classList.remove("visible");
+
+        for (let i = 0; i < 5; i++) {
+          const fb = document.getElementById("s3-fb-" + i);
+          fb.className = "feedback-box";
+          fb.textContent = "Choose an option for Situation " + (i + 1) + ".";
+        }
+        s3Next.disabled = true;
+        s3Celebration.classList.remove("visible");
+
+        finalQuote.classList.remove("visible");
+        scoreLive.textContent = "";
+
+        updateScore(false);
+        showScreen("intro");
+      });
+
+      updateScore(false);
+    })();
+  </script>
+</body>
+</html>
