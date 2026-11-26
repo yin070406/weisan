@@ -1,0 +1,1787 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Escape the First Semester: An Online SDT Campus Adventure</title>
+  <style>
+    :root {
+      --bg: #faf8f1;
+      --surface: #ffffff;
+      --surface-soft: #f3f6fa;
+      --brand-blue: #d6e4f0;
+      --navy: #000080;
+      --navy-soft: #1e3a6d;
+      --sage: #5c7a44;
+      --sage-light: #e9f0e3;
+      --coral: #d96b5c;
+      --coral-light: #fbeae7;
+      --amber: #b7791f;
+      --amber-light: #fef5e7;
+      --ink: #1e242b;
+      --muted: #556070;
+      --border: #d8e0ea;
+      --radius: 12px;
+      --shadow: 0 2px 8px rgba(15, 23, 42, 0.07);
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-6: 24px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+
+    .app-header {
+      background: var(--surface);
+      border-bottom: 2px solid var(--brand-blue);
+      padding: var(--space-3) var(--space-4);
+    }
+
+    .header-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+    }
+
+    .brand-block h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: var(--navy);
+      line-height: 1.25;
+    }
+
+    .brand-subtitle {
+      margin: 2px 0 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .keys-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      align-items: center;
+    }
+
+    .key-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: #f2f2f2;
+      color: var(--muted);
+      transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .key-pill.partial {
+      background: var(--amber-light);
+      border-color: #ecc94b;
+      color: var(--amber);
+    }
+
+    .key-pill.unlocked {
+      background: var(--sage-light);
+      border-color: var(--sage);
+      color: var(--sage);
+    }
+
+    .main-shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: var(--space-4);
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+
+    @media (min-width: 940px) {
+      .main-shell {
+        grid-template-columns: minmax(0, 1.65fr) minmax(310px, 1fr);
+        align-items: start;
+      }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: var(--space-4);
+    }
+
+    .map-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+
+    .map-header h2 {
+      margin: 0;
+      font-size: 1.05rem;
+      color: var(--navy-soft);
+    }
+
+    .controls-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      background: var(--brand-blue);
+      padding: 4px 10px;
+      border-radius: 6px;
+      color: #102a43;
+      font-weight: 500;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      background: #eef5e8;
+      border: 2px solid #c5d6be;
+      border-radius: 10px;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    canvas#campusMap {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .map-prompt-bar {
+      margin-top: var(--space-3);
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-2);
+      font-size: 0.9rem;
+    }
+
+    .touch-controls {
+      margin-top: var(--space-3);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      padding-top: var(--space-2);
+      border-top: 1px solid var(--border);
+    }
+
+    .dpad {
+      display: grid;
+      grid-template-columns: repeat(3, 44px);
+      grid-template-rows: repeat(2, 42px);
+      gap: 6px;
+    }
+
+    .dpad-btn {
+      font: inherit;
+      font-weight: 700;
+      font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--navy-soft);
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.12s ease, transform 0.08s ease;
+    }
+
+    .dpad-btn:hover {
+      background: var(--brand-blue);
+    }
+
+    .dpad-btn:active,
+    .dpad-btn.active {
+      background: var(--navy);
+      color: #ffffff;
+      transform: scale(0.96);
+    }
+
+    .dpad-btn:focus-visible,
+    .btn:focus-visible,
+    .choice-btn:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 2px solid var(--navy);
+      outline-offset: 2px;
+    }
+
+    .btn {
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 9px 15px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--navy);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #142d99;
+    }
+
+    .btn-sage {
+      background: var(--sage);
+      color: #ffffff;
+    }
+
+    .btn-sage:hover:not(:disabled) {
+      background: #4b6537;
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--ink);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #f2f4f7;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .side-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .section-title {
+      margin: 0 0 var(--space-3);
+      font-size: 1rem;
+      color: var(--navy-soft);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mission-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .mission-item {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-2);
+      font-size: 0.86rem;
+    }
+
+    .mission-item.active {
+      border-color: var(--navy);
+      background: #f5f9ff;
+    }
+
+    .mission-item.done {
+      border-color: #b7d3a8;
+      background: var(--sage-light);
+    }
+
+    .mission-item.locked {
+      opacity: 0.68;
+      background: #f7f7f7;
+    }
+
+    .mission-meta {
+      display: block;
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .status-tag {
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .status-tag.done {
+      background: var(--sage);
+      color: #ffffff;
+    }
+
+    .status-tag.open {
+      background: var(--brand-blue);
+      color: var(--navy);
+    }
+
+    .status-tag.locked {
+      background: #e5e7eb;
+      color: var(--muted);
+    }
+
+    .ethics-box {
+      font-size: 0.8rem;
+      color: var(--muted);
+      background: #f9fafb;
+      border-left: 3px solid var(--navy-soft);
+      padding: 10px 12px;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .ethics-box strong {
+      color: var(--ink);
+    }
+
+    /* Modal / Panel Overlay */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+      z-index: 50;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-panel {
+      background: var(--surface);
+      border-radius: var(--radius);
+      max-width: 680px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.2);
+      padding: var(--space-6);
+    }
+
+    .modal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+
+    .sdt-badge {
+      display: inline-block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--brand-blue);
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 1.25rem;
+      color: var(--navy);
+    }
+
+    .scenario-box {
+      background: var(--bg);
+      border: 1px solid #e2dfd5;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: var(--space-4);
+      font-size: 0.93rem;
+    }
+
+    .task-heading {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin: 0 0 var(--space-2);
+      color: var(--ink);
+    }
+
+    .step-pool,
+    .choice-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+
+    .choice-btn {
+      font: inherit;
+      text-align: left;
+      padding: 11px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-2);
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    .choice-btn:hover:not(:disabled) {
+      border-color: var(--navy);
+      background: #f7faff;
+    }
+
+    .choice-btn.selected {
+      border-color: var(--navy);
+      background: var(--brand-blue);
+      font-weight: 600;
+    }
+
+    .order-number {
+      display: inline-flex;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .match-row {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: var(--space-2);
+      background: #fbfcfe;
+    }
+
+    .match-row label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .select-input {
+      width: 100%;
+      font: inherit;
+      font-size: 0.88rem;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--ink);
+    }
+
+    .hint-box {
+      display: none;
+      margin: var(--space-3) 0;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: var(--amber-light);
+      border: 1px solid #f6ad55;
+      font-size: 0.86rem;
+      color: #744210;
+    }
+
+    .hint-box.visible {
+      display: block;
+    }
+
+    .feedback-box {
+      display: none;
+      margin-top: var(--space-4);
+      padding: 14px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .feedback-box.visible {
+      display: block;
+    }
+
+    .feedback-box.gentle {
+      background: var(--coral-light);
+      border: 1px solid #f2b8b0;
+      color: #7a271a;
+    }
+
+    .feedback-box.success {
+      background: var(--sage-light);
+      border: 1px solid #9ec488;
+      color: #233d17;
+    }
+
+    .plan-summary-card {
+      margin-top: var(--space-3);
+      padding: var(--space-4);
+      border-radius: 10px;
+      background: var(--surface);
+      border: 2px solid var(--sage);
+    }
+
+    .plan-summary-card h4 {
+      margin: 0 0 var(--space-2);
+      color: var(--navy);
+    }
+
+    .plan-summary-list {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 0.88rem;
+    }
+
+    .plan-summary-list li {
+      margin-bottom: 6px;
+    }
+
+    .modal-actions {
+      margin-top: var(--space-4);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .eval-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+
+    .eval-stat {
+      padding: 8px 10px;
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.8rem;
+    }
+
+    .eval-stat strong {
+      display: block;
+      font-size: 1rem;
+      color: var(--navy);
+    }
+
+    .likert-group {
+      margin-bottom: var(--space-3);
+    }
+
+    .likert-group p {
+      margin: 0 0 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .likert-options {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .likert-btn {
+      font: inherit;
+      font-size: 0.82rem;
+      padding: 6px 11px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+    }
+
+    .likert-btn.selected {
+      background: var(--navy);
+      color: #ffffff;
+      border-color: var(--navy);
+    }
+
+    textarea.reflection-input {
+      width: 100%;
+      min-height: 70px;
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 0.88rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      resize: vertical;
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-block">
+        <h1>Escape the First Semester</h1>
+        <p class="brand-subtitle">An Online SDT Campus Adventure for Hong Kong Year One University Students</p>
+      </div>
+      <div class="keys-bar" aria-label="SDT Keys Progress">
+        <span id="keyCompetence" class="key-pill">🔒 Competence Key (0/2)</span>
+        <span id="keyRelatedness" class="key-pill">🔒 Relatedness Key</span>
+        <span id="keyAutonomy" class="key-pill">🔒 Autonomy Key</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-shell">
+    <section class="card" aria-label="Interactive Campus Map">
+      <div class="map-header">
+        <h2>Campus Adventure Map (Single-Player Prototype)</h2>
+        <span class="controls-hint">Move: Arrow Keys / WASD / Touch Buttons</span>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas id="campusMap" width="800" height="500" aria-label="2D university campus map with five mission buildings"></canvas>
+      </div>
+
+      <div class="map-prompt-bar">
+        <span id="proximityText">Walk to <strong>1. Academic Building</strong> to start Mission 1: Assignment Rescue.</span>
+        <button type="button" id="openNearbyBtn" class="btn btn-primary" disabled>Open Mission</button>
+      </div>
+
+      <div class="touch-controls" aria-label="On-screen movement and programme tools">
+        <div class="dpad" role="group" aria-label="Directional movement buttons">
+          <div></div>
+          <button type="button" class="dpad-btn" data-dir="up" aria-label="Move Up">▲</button>
+          <div></div>
+          <button type="button" class="dpad-btn" data-dir="left" aria-label="Move Left">◀</button>
+          <button type="button" class="dpad-btn" data-dir="down" aria-label="Move Down">▼</button>
+          <button type="button" class="dpad-btn" data-dir="right" aria-label="Move Right">▶</button>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button type="button" id="openEvalBtn" class="btn btn-secondary">Programme Feedback &amp; Log</button>
+          <button type="button" id="resetGameBtn" class="btn btn-secondary">Reset Demo</button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="side-stack">
+      <section class="card" aria-label="Campus Missions">
+        <h2 class="section-title">
+          <span>Five Campus Missions</span>
+          <span id="progressSummary" style="font-size:0.82rem; color:var(--muted); font-weight:600;">0 / 5 Completed</span>
+        </h2>
+        <ul id="missionList" class="mission-list"></ul>
+      </section>
+
+      <section class="card" aria-label="Programme Scope and Ethical Notice">
+        <h2 class="section-title"><span>SDT Logic &amp; Ethical Notes</span></h2>
+        <div class="ethics-box">
+          <p style="margin:0 0 8px;">
+            <strong>Self-Determination Theory (SDT):</strong> Missions 1–2 unlock the <strong>Competence Key</strong>, Mission 3 unlocks the <strong>Relatedness Key</strong>, Mission 4 unlocks the <strong>Autonomy Key</strong>, and Mission 5 integrates all three needs in Reflection Hall.
+          </p>
+          <p style="margin:0;">
+            <strong>Important Scope &amp; Care Notice:</strong> This single-player educational game explores first-semester academic stress through fictional scenarios. Completing the game represents expected learning awareness only and cannot replace professional counselling, academic advising, or real-life peer support. If you experience persistent distress, please contact your university's Student Counselling Service.
+          </p>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <!-- Mission Modal -->
+  <div id="missionModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-panel">
+      <div class="modal-top">
+        <div>
+          <span id="modalSdtBadge" class="sdt-badge">Primary SDT Need: Competence</span>
+          <h3 id="modalTitle" class="modal-title">Mission Title</h3>
+          <div id="modalLocation" style="font-size:0.83rem; color:var(--muted); margin-top:2px;">Location</div>
+        </div>
+        <button type="button" id="closeMissionBtn" class="btn btn-secondary" style="padding:6px 12px;">Back to Map</button>
+      </div>
+
+      <div id="modalScenario" class="scenario-box"></div>
+      <div id="modalTaskArea"></div>
+
+      <div id="modalHintBox" class="hint-box"></div>
+      <div id="modalFeedbackBox" class="feedback-box"></div>
+
+      <div class="modal-actions">
+        <button type="button" id="hintBtn" class="btn btn-secondary">Need a Hint?</button>
+        <div style="display:flex; gap:8px;">
+          <button type="button" id="checkTaskBtn" class="btn btn-primary">Submit Answer</button>
+          <button type="button" id="finishMissionBtn" class="btn btn-sage" style="display:none;">Collect Reward &amp; Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Programme Evaluation & Pre/Post Feedback Preview Modal -->
+  <div id="evalModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="evalModalTitle">
+    <div class="modal-panel">
+      <div class="modal-top">
+        <div>
+          <span class="sdt-badge">Proposed Programme Evaluation Component</span>
+          <h3 id="evalModalTitle" class="modal-title">Pre-/Post-Game Feedback &amp; Activity Log</h3>
+        </div>
+        <button type="button" id="closeEvalBtn" class="btn btn-secondary" style="padding:6px 12px;">Close</button>
+      </div>
+
+      <p style="font-size:0.84rem; color:var(--muted); margin-top:0;">
+        <em>Note: The items below are researcher-created programme-feedback questions and in-game completion records for programme evaluation demonstration. They are not a validated psychological scale, and responses are held only in browser memory during this session.</em>
+      </p>
+
+      <div class="eval-grid">
+        <div class="eval-stat">
+          <span>Missions Completed</span>
+          <strong id="statCompleted">0 / 5</strong>
+        </div>
+        <div class="eval-stat">
+          <span>Completion Rate</span>
+          <strong id="statRate">0%</strong>
+        </div>
+        <div class="eval-stat">
+          <span>Hints Used</span>
+          <strong id="statHints">0</strong>
+        </div>
+      </div>
+
+      <div class="likert-group">
+        <p>1. Pre-Game Check: How confident do you currently feel about handling first-semester university workload? (1 = Low, 5 = High)</p>
+        <div class="likert-options" data-q="preConfidence">
+          <button type="button" class="likert-btn" data-val="1">1</button>
+          <button type="button" class="likert-btn" data-val="2">2</button>
+          <button type="button" class="likert-btn" data-val="3">3</button>
+          <button type="button" class="likert-btn" data-val="4">4</button>
+          <button type="button" class="likert-btn" data-val="5">5</button>
+        </div>
+      </div>
+
+      <div class="likert-group">
+        <p>2. Post-Game Check: How relevant and usable were these campus scenarios for Hong Kong Year One students? (1 = Low, 5 = High)</p>
+        <div class="likert-options" data-q="postUsability">
+          <button type="button" class="likert-btn" data-val="1">1</button>
+          <button type="button" class="likert-btn" data-val="2">2</button>
+          <button type="button" class="likert-btn" data-val="3">3</button>
+          <button type="button" class="likert-btn" data-val="4">4</button>
+          <button type="button" class="likert-btn" data-val="5">5</button>
+        </div>
+      </div>
+
+      <div class="likert-group">
+        <p>3. Short SDT Reflection Question: Which SDT need (Autonomy, Competence, or Relatedness) feels most helpful for your own first semester, and why?</p>
+        <textarea id="sdtReflectionInput" class="reflection-input" placeholder="Optional reflection response..."></textarea>
+      </div>
+
+      <div id="evalSavedNotice" style="display:none; font-size:0.85rem; color:var(--sage); font-weight:600; margin-bottom:8px;">
+        Programme feedback recorded in session log.
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button type="button" id="saveEvalBtn" class="btn btn-primary">Record Feedback in Session</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const MISSIONS = [
+        {
+          id: 1,
+          name: "Mission 1: Assignment Rescue",
+          building: "Academic Building",
+          sdtLabel: "Primary SDT Need: Competence",
+          rewardLabel: "Competence Key Fragment (1/2)",
+          x: 155,
+          y: 130,
+          color: "#4a7c59",
+          scenario: "Scenario: A Hong Kong Year One student receives their first 1,500-word English academic essay with APA 7 citations due in two weeks. They feel high academic stress and do not know how to begin.",
+          hint: "Hint: Start by understanding what the lecturer is grading before searching for articles, outlining, or proofreading.",
+          feedback: "Informational SDT Feedback (Competence): Dividing a large 1,500-word university essay into small, logical steps creates clear structure and reduces cognitive overload. Recognising that a difficult assignment can be handled step by step supports Competence—feeling capable and effective when facing academic challenges.",
+          steps: [
+            { id: "s1", text: "Read the assignment instructions and marking rubric carefully.", correctOrder: 1 },
+            { id: "s2", text: "Break the essay question into small search keywords and find academic sources.", correctOrder: 2 },
+            { id: "s3", text: "Draft a simple section outline before writing full paragraphs.", correctOrder: 3 },
+            { id: "s4", text: "Check APA 7 citations and proofread before submission.", correctOrder: 4 }
+          ]
+        },
+        {
+          id: 2,
+          name: "Mission 2: Support Service Hunt",
+          building: "Library & Student Support Centre",
+          sdtLabel: "Primary: Competence | Supporting: Relatedness",
+          rewardLabel: "Competence Key Fragment (2/2) → Full Competence Key",
+          x: 420,
+          y: 115,
+          color: "#2b6cb0",
+          scenario: "Scenario: During midterm season at a Hong Kong university, three Year One peers face different academic stress difficulties. Match each difficulty with the most appropriate campus support resource. (Reminder: In real distress, students should contact their university counselling service directly.)",
+          hint: "Hint: Match research/writing questions with the Library, emotional/sleep stress with Student Counselling, and course workload rules with Academic Advising.",
+          feedback: "Informational SDT Feedback (Competence + Relatedness): Knowing which university unit matches each difficulty builds Competence in navigating campus systems effectively. It also supports Relatedness awareness by reminding Year One students that help-seeking is normal and institutional care is available.",
+          matches: [
+            {
+              id: "mA",
+              prompt: "Case A: Unsure how to search journal databases and structure academic writing.",
+              correct: "library"
+            },
+            {
+              id: "mB",
+              prompt: "Case B: Experiencing persistent academic anxiety and poor sleep for weeks.",
+              correct: "counselling"
+            },
+            {
+              id: "mC",
+              prompt: "Case C: Confused about course workload balance and add/drop progression rules.",
+              correct: "advising"
+            }
+          ],
+          serviceOptions: [
+            { value: "", label: "-- Select appropriate university support unit --" },
+            { value: "advising", label: "Academic Advising Office" },
+            { value: "library", label: "University Library / Language Consultation Workshop" },
+            { value: "counselling", label: "Student Counselling Service (Student Affairs Office)" }
+          ]
+        },
+        {
+          id: 3,
+          name: "Mission 3: Group Project Challenge",
+          building: "Student Centre",
+          sdtLabel: "Primary: Relatedness | Supporting: Autonomy",
+          rewardLabel: "Unlocks Relatedness Key",
+          x: 655,
+          y: 215,
+          color: "#c05621",
+          scenario: "Scenario: During peak midterm week at a Hong Kong university, a groupmate misses an internal draft deadline because they are overwhelmed by two tests. Stress rises in the group chat.",
+          hint: "Hint: Look for a message that communicates clear team expectations respectfully while offering the teammate a realistic choice, rather than scolding or silently doing everything alone.",
+          feedback: "Informational SDT Feedback (Relatedness + Autonomy): Checking in respectfully while clarifying timelines supports Relatedness awareness (mutual care and constructive peer communication) and respects Autonomy (inviting realistic collaboration instead of using threats). Note: As a single-player scenario, this builds communication awareness rather than replacing real-life social interaction.",
+          options: [
+            {
+              id: "optA",
+              text: "Option A: Publicly scold the groupmate in the chat and threaten to remove their name immediately.",
+              isTarget: false,
+              gentleNote: "Let's reconsider Option A: Publicly threatening a stressed teammate uses controlling pressure, which often increases conflict and hurts both Autonomy and group Relatedness. Try another response."
+            },
+            {
+              id: "optB",
+              text: "Option B: Stay silent, feel resentful, and rewrite their whole section alone late at night.",
+              isTarget: false,
+              gentleNote: "Let's reconsider Option B: Silently taking over protects short-term output, but it increases your own academic exhaustion and prevents open, supportive peer communication. Try another response."
+            },
+            {
+              id: "optC",
+              text: "Option C: Check in respectfully, explain the team's timeline clearly, ask which smaller part they can realistically finish by tomorrow, and agree on a clear plan together.",
+              isTarget: true
+            }
+          ]
+        },
+        {
+          id: 4,
+          name: "Mission 4: Choose Your University Path",
+          building: "Campus Activity & Career Centre",
+          sdtLabel: "Primary SDT Need: Autonomy",
+          rewardLabel: "Unlocks Autonomy Key",
+          x: 235,
+          y: 375,
+          color: "#6b46c1",
+          scenario: "Scenario: A Hong Kong Year One student feels intense peer comparison ('chur' campus culture—pressure to chase top GPA, join multiple society committees, and work late shifts all at once), causing heavy academic stress.",
+          hint: "Hint: Autonomy means choosing a realistic, sustainable path that fits your own priorities—there is more than one balanced answer!",
+          feedback: "Informational SDT Feedback (Autonomy): There is no single 'correct' university life route. Choosing a realistic pace that aligns with your own values—rather than copying peer pressure—supports Autonomy (self-endorsed choice and self-regulation) during first-semester transition.",
+          pathways: [
+            {
+              id: "pathA",
+              text: "Path A (Steady Study Rhythm): Focus on adapting to university lectures, study groups, and healthy rest before adding extra roles next semester.",
+              balanced: true
+            },
+            {
+              id: "pathB",
+              text: "Path B (Balanced Campus Explorer): Keep protected weekly study blocks while joining one enjoyable interest club without heavy committee duties yet.",
+              balanced: true
+            },
+            {
+              id: "pathC",
+              text: "Path C (Structured Skill Pacing): Pair a manageable course load with light, fixed-hour skill practice while keeping midterm and exam weeks free.",
+              balanced: true
+            },
+            {
+              id: "pathD",
+              text: "Path D (Overload Everything at Once): Force yourself into two society committees, late-night part-time shifts, and perfectionist study hours just to keep up with peers.",
+              balanced: false,
+              gentleNote: "Gentle Reflection on Path D: Chasing every external expectation at once is driven by controlled peer pressure rather than self-endorsed Autonomy, increasing burnout risk. Choose Path A, B, or C to practise a sustainable personal pace."
+            }
+          ]
+        },
+        {
+          id: 5,
+          name: "Mission 5: Build Your First-Semester Support Plan",
+          building: "Reflection Hall",
+          sdtLabel: "Integrated: Autonomy, Competence & Relatedness",
+          rewardLabel: "Personalised First-Semester Support Plan",
+          x: 565,
+          y: 385,
+          color: "#000080",
+          scenario: "Scenario: Using your Competence Key, Relatedness Key, and Autonomy Key, you enter Reflection Hall! Select one realistic item in each category below to build your personal First-Semester Support Plan.",
+          hint: "Hint: Choose one option in all four dropdown menus—any combination that feels realistic and supportive for a Year One student works!",
+          feedback: "Integrated SDT Summary: Your plan brings all three basic psychological needs together—a meaningful self-chosen goal (Autonomy), a small doable next action (Competence), an appropriate campus or peer support channel (Relatedness), and a flexible backup plan when schedules change.",
+          planBlocks: [
+            {
+              id: "goal",
+              label: "1. Meaningful Personal Goal (Autonomy)",
+              choices: [
+                "Focus on steady learning progress rather than comparing my GPA with everyone else.",
+                "Prioritise clear understanding in my core courses at a sustainable weekly pace.",
+                "Maintain balanced study hours alongside regular sleep during assignment weeks."
+              ]
+            },
+            {
+              id: "action",
+              label: "2. Manageable Next Action (Competence)",
+              choices: [
+                "Spend 25 minutes today outlining one section of my upcoming assignment.",
+                "Check the marking rubric and find two peer-reviewed articles this afternoon.",
+                "Divide my weekly reading into two short, focused 20-minute study blocks."
+              ]
+            },
+            {
+              id: "support",
+              label: "3. Appropriate Support Source (Relatedness)",
+              choices: [
+                "Book a University Library or Academic Advising consultation when unsure about coursework.",
+                "Check in respectfully with a study peer or groupmate early to coordinate shared tasks.",
+                "Contact the Student Counselling Service if academic stress starts affecting my sleep or mood."
+              ]
+            },
+            {
+              id: "backup",
+              label: "4. Realistic Alternative Plan (Autonomy + Competence)",
+              choices: [
+                "If my week gets disrupted, adjust my timeline early and prioritise core rubric requirements.",
+                "If an essay topic feels too broad, narrow the question and clarify with my tutor early.",
+                "If group schedules clash, message teammates calmly to divide remaining work into small steps."
+              ]
+            }
+          ]
+        }
+      ];
+
+      const state = {
+        player: { x: 85, y: 255, r: 14, speed: 3.4 },
+        targetPos: null,
+        keysHeld: { up: false, down: false, left: false, right: false },
+        completed: [],
+        hintsUsed: 0,
+        activeMissionId: null,
+        nearbyMissionId: null,
+        m1SelectedOrder: [],
+        m3SelectedOption: null,
+        m4SelectedPath: null,
+        savedPlan: null,
+        evalResponses: { preConfidence: null, postUsability: null, reflection: "" }
+      };
+
+      const canvas = document.getElementById("campusMap");
+      const ctx = canvas.getContext("2d");
+      const proximityText = document.getElementById("proximityText");
+      const openNearbyBtn = document.getElementById("openNearbyBtn");
+      const missionListEl = document.getElementById("missionList");
+      const progressSummaryEl = document.getElementById("progressSummary");
+
+      const keyCompetenceEl = document.getElementById("keyCompetence");
+      const keyRelatednessEl = document.getElementById("keyRelatedness");
+      const keyAutonomyEl = document.getElementById("keyAutonomy");
+
+      const missionModal = document.getElementById("missionModal");
+      const modalSdtBadge = document.getElementById("modalSdtBadge");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalLocation = document.getElementById("modalLocation");
+      const modalScenario = document.getElementById("modalScenario");
+      const modalTaskArea = document.getElementById("modalTaskArea");
+      const modalHintBox = document.getElementById("modalHintBox");
+      const modalFeedbackBox = document.getElementById("modalFeedbackBox");
+      const hintBtn = document.getElementById("hintBtn");
+      const checkTaskBtn = document.getElementById("checkTaskBtn");
+      const finishMissionBtn = document.getElementById("finishMissionBtn");
+      const closeMissionBtn = document.getElementById("closeMissionBtn");
+
+      const evalModal = document.getElementById("evalModal");
+
+      function isMissionUnlocked(id) {
+        if (id === 1) return true;
+        return state.completed.includes(id - 1);
+      }
+
+      function isMissionCompleted(id) {
+        return state.completed.includes(id);
+      }
+
+      function updateHeaderAndSidebar() {
+        const m1Done = isMissionCompleted(1);
+        const m2Done = isMissionCompleted(2);
+        const m3Done = isMissionCompleted(3);
+        const m4Done = isMissionCompleted(4);
+
+        if (m2Done) {
+          keyCompetenceEl.className = "key-pill unlocked";
+          keyCompetenceEl.textContent = "🔑 Competence Key (Unlocked)";
+        } else if (m1Done) {
+          keyCompetenceEl.className = "key-pill partial";
+          keyCompetenceEl.textContent = "🧩 Competence Fragment (1/2)";
+        } else {
+          keyCompetenceEl.className = "key-pill";
+          keyCompetenceEl.textContent = "🔒 Competence Key (0/2)";
+        }
+
+        if (m3Done) {
+          keyRelatednessEl.className = "key-pill unlocked";
+          keyRelatednessEl.textContent = "🔑 Relatedness Key (Unlocked)";
+        } else {
+          keyRelatednessEl.className = "key-pill";
+          keyRelatednessEl.textContent = "🔒 Relatedness Key";
+        }
+
+        if (m4Done) {
+          keyAutonomyEl.className = "key-pill unlocked";
+          keyAutonomyEl.textContent = "🔑 Autonomy Key (Unlocked)";
+        } else {
+          keyAutonomyEl.className = "key-pill";
+          keyAutonomyEl.textContent = "🔒 Autonomy Key";
+        }
+
+        progressSummaryEl.textContent = state.completed.length + " / 5 Completed";
+
+        missionListEl.innerHTML = "";
+        MISSIONS.forEach(function (m) {
+          const done = isMissionCompleted(m.id);
+          const unlocked = isMissionUnlocked(m.id);
+          const li = document.createElement("li");
+          li.className = "mission-item " + (done ? "done" : unlocked ? "active" : "locked");
+
+          const infoDiv = document.createElement("div");
+          const titleStrong = document.createElement("strong");
+          titleStrong.textContent = m.name;
+          const metaSpan = document.createElement("span");
+          metaSpan.className = "mission-meta";
+          metaSpan.textContent = m.building + " • " + m.sdtLabel;
+          infoDiv.appendChild(titleStrong);
+          infoDiv.appendChild(metaSpan);
+
+          const tagSpan = document.createElement("span");
+          if (done) {
+            tagSpan.className = "status-tag done";
+            tagSpan.textContent = "Completed";
+          } else if (unlocked) {
+            tagSpan.className = "status-tag open";
+            tagSpan.textContent = "Unlocked";
+          } else {
+            tagSpan.className = "status-tag locked";
+            tagSpan.textContent = "Locked";
+          }
+
+          li.appendChild(infoDiv);
+          li.appendChild(tagSpan);
+          missionListEl.appendChild(li);
+        });
+      }
+
+      function drawMap() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Lawn background
+        ctx.fillStyle = "#edf5e6";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Decorative campus courtyard pond & trees
+        ctx.fillStyle = "#d6e4f0";
+        ctx.beginPath();
+        ctx.ellipse(400, 265, 78, 42, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#b5cde2";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = "#3b5978";
+        ctx.font = "600 11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("Campus Lawn", 400, 269);
+
+        // Campus walkways connecting start -> M1 -> M2 -> M3 -> M4 -> M5
+        ctx.strokeStyle = "#dfd7c5";
+        ctx.lineWidth = 22;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        ctx.moveTo(85, 255);
+        ctx.lineTo(155, 130);
+        ctx.lineTo(420, 115);
+        ctx.lineTo(655, 215);
+        ctx.lineTo(235, 375);
+        ctx.lineTo(565, 385);
+        ctx.stroke();
+
+        // Dashed path center line
+        ctx.strokeStyle = "#cbbda2";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 6]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Decorative trees
+        const trees = [
+          [70, 95], [285, 85], [565, 95], [735, 110],
+          [95, 415], [395, 435], [720, 395], [735, 295]
+        ];
+        trees.forEach(function (t) {
+          ctx.fillStyle = "#8ab072";
+          ctx.beginPath();
+          ctx.arc(t[0], t[1], 16, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "#6d9456";
+          ctx.beginPath();
+          ctx.arc(t[0] - 4, t[1] - 4, 10, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Draw Mission Buildings
+        MISSIONS.forEach(function (m) {
+          const unlocked = isMissionUnlocked(m.id);
+          const done = isMissionCompleted(m.id);
+          const isNear = state.nearbyMissionId === m.id;
+
+          // Proximity halo
+          ctx.beginPath();
+          ctx.arc(m.x, m.y, 48, 0, Math.PI * 2);
+          if (done) {
+            ctx.fillStyle = "rgba(92, 122, 68, 0.16)";
+          } else if (unlocked) {
+            ctx.fillStyle = isNear ? "rgba(0, 0, 128, 0.20)" : "rgba(37, 99, 235, 0.12)";
+          } else {
+            ctx.fillStyle = "rgba(148, 163, 184, 0.14)";
+          }
+          ctx.fill();
+
+          // Building card shape
+          const bw = 116;
+          const bh = 60;
+          const bx = m.x - bw / 2;
+          const by = m.y - bh / 2;
+          const rad = 10;
+
+          function traceRoundedRect(x, y, w, h, rTop, rBottom) {
+            ctx.beginPath();
+            ctx.moveTo(x + rTop, y);
+            ctx.lineTo(x + w - rTop, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + rTop);
+            ctx.lineTo(x + w, y + h - rBottom);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - rBottom, y + h);
+            ctx.lineTo(x + rBottom, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - rBottom);
+            ctx.lineTo(x, y + rTop);
+            ctx.quadraticCurveTo(x, y, x + rTop, y);
+            ctx.closePath();
+          }
+
+          ctx.fillStyle = unlocked ? "#ffffff" : "#e5e7eb";
+          ctx.strokeStyle = done ? "#5c7a44" : unlocked ? m.color : "#9ca3af";
+          ctx.lineWidth = isNear ? 3.5 : 2.5;
+          traceRoundedRect(bx, by, bw, bh, rad, rad);
+          ctx.fill();
+          ctx.stroke();
+
+          // Roof banner
+          ctx.fillStyle = done ? "#5c7a44" : unlocked ? m.color : "#9ca3af";
+          traceRoundedRect(bx, by, bw, 19, 9, 0);
+          ctx.fill();
+
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "700 11px sans-serif";
+          ctx.textAlign = "center";
+          const badgeIcon = done ? "✓ " : unlocked ? "" : "🔒 ";
+          ctx.fillText(badgeIcon + "Mission " + m.id, m.x, by + 13);
+
+          // Building label
+          ctx.fillStyle = unlocked ? "#1e242b" : "#6b7280";
+          ctx.font = "600 11px sans-serif";
+          const shortBldg = m.building.length > 20 ? m.building.slice(0, 19) + "…" : m.building;
+          ctx.fillText(shortBldg, m.x, by + 36);
+
+          ctx.fillStyle = done ? "#5c7a44" : unlocked ? "#1e3a6d" : "#6b7280";
+          ctx.font = "500 10px sans-serif";
+          ctx.fillText(done ? "Completed" : unlocked ? "Walk here" : "Locked", m.x, by + 51);
+        });
+
+        // Draw Player Character
+        const p = state.player;
+        ctx.fillStyle = "rgba(0,0,0,0.16)";
+        ctx.beginPath();
+        ctx.ellipse(p.x, p.y + 13, 12, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Body
+        ctx.fillStyle = "#d96b5c";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+
+        // Friendly eyes
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(p.x - 4, p.y - 2, 2.2, 0, Math.PI * 2);
+        ctx.arc(p.x + 4, p.y - 2, 2.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Player tag
+        ctx.fillStyle = "#000080";
+        ctx.font = "700 11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("YOU", p.x, p.y - 20);
+      }
+
+      function updateMovement() {
+        if (missionModal.classList.contains("open") || evalModal.classList.contains("open")) {
+          return;
+        }
+
+        let dx = 0;
+        let dy = 0;
+        if (state.keysHeld.left) dx -= 1;
+        if (state.keysHeld.right) dx += 1;
+        if (state.keysHeld.up) dy -= 1;
+        if (state.keysHeld.down) dy += 1;
+
+        if (dx !== 0 || dy !== 0) {
+          state.targetPos = null;
+          const len = Math.hypot(dx, dy);
+          state.player.x += (dx / len) * state.player.speed;
+          state.player.y += (dy / len) * state.player.speed;
+        } else if (state.targetPos) {
+          const tx = state.targetPos.x - state.player.x;
+          const ty = state.targetPos.y - state.player.y;
+          const dist = Math.hypot(tx, ty);
+          if (dist > 4) {
+            state.player.x += (tx / dist) * state.player.speed;
+            state.player.y += (ty / dist) * state.player.speed;
+          } else {
+            state.targetPos = null;
+          }
+        }
+
+        // Keep player inside map bounds
+        state.player.x = Math.max(24, Math.min(canvas.width - 24, state.player.x));
+        state.player.y = Math.max(28, Math.min(canvas.height - 24, state.player.y));
+
+        // Check proximity to missions
+        let foundNear = null;
+        MISSIONS.forEach(function (m) {
+          const dist = Math.hypot(state.player.x - m.x, state.player.y - m.y);
+          if (dist < 56) {
+            foundNear = m;
+          }
+        });
+
+        if (foundNear) {
+          if (state.nearbyMissionId !== foundNear.id) {
+            state.nearbyMissionId = foundNear.id;
+            if (isMissionUnlocked(foundNear.id)) {
+              proximityText.innerHTML = "At <strong>" + foundNear.building + "</strong> — Ready for <strong>" + foundNear.name + "</strong>.";
+              openNearbyBtn.disabled = false;
+              openNearbyBtn.textContent = isMissionCompleted(foundNear.id) ? "Review Mission " + foundNear.id : "Open Mission " + foundNear.id;
+              // Automatically open unlocked incomplete mission when walking onto it
+              if (!isMissionCompleted(foundNear.id)) {
+                state.targetPos = null;
+                openMissionModal(foundNear.id);
+              }
+            } else {
+              proximityText.innerHTML = "🔒 <strong>" + foundNear.building + "</strong> is locked. Complete Mission " + (foundNear.id - 1) + " first.";
+              openNearbyBtn.disabled = true;
+              openNearbyBtn.textContent = "Locked";
+            }
+          }
+        } else if (state.nearbyMissionId !== null) {
+          state.nearbyMissionId = null;
+          const nextId = state.completed.length < 5 ? state.completed.length + 1 : null;
+          if (nextId) {
+            const nextM = MISSIONS[nextId - 1];
+            proximityText.innerHTML = "Next unlocked point: <strong>Mission " + nextM.id + " (" + nextM.building + ")</strong>. Walk there or tap the map.";
+          } else {
+            proximityText.innerHTML = "All 5 missions and 3 SDT Keys completed! You can review any building or check Programme Feedback.";
+          }
+          openNearbyBtn.disabled = true;
+          openNearbyBtn.textContent = "Open Mission";
+        }
+      }
+
+      function gameLoop() {
+        updateMovement();
+        drawMap();
+        requestAnimationFrame(gameLoop);
+      }
+
+      // Keyboard controls (WASD + Arrows + Enter)
+      window.addEventListener("keydown", function (e) {
+        const tag = document.activeElement ? document.activeElement.tagName : "";
+        if (tag === "TEXTAREA" || tag === "SELECT" || tag === "INPUT") return;
+
+        const k = e.key.toLowerCase();
+        if (k === "arrowup" || k === "w") { state.keysHeld.up = true; e.preventDefault(); }
+        if (k === "arrowdown" || k === "s") { state.keysHeld.down = true; e.preventDefault(); }
+        if (k === "arrowleft" || k === "a") { state.keysHeld.left = true; e.preventDefault(); }
+        if (k === "arrowright" || k === "d") { state.keysHeld.right = true; e.preventDefault(); }
+        if (k === "enter" && !openNearbyBtn.disabled && !missionModal.classList.contains("open")) {
+          openMissionModal(state.nearbyMissionId);
+        }
+      });
+
+      window.addEventListener("keyup", function (e) {
+        const k = e.key.toLowerCase();
+        if (k === "arrowup" || k === "w") state.keysHeld.up = false;
+        if (k === "arrowdown" || k === "s") state.keysHeld.down = false;
+        if (k === "arrowleft" || k === "a") state.keysHeld.left = false;
+        if (k === "arrowright" || k === "d") state.keysHeld.right = false;
+      });
+
+      // On-screen directional buttons (mouse + touch)
+      document.querySelectorAll(".dpad-btn").forEach(function (btn) {
+        const dir = btn.getAttribute("data-dir");
+        function startMove(ev) {
+          ev.preventDefault();
+          state.keysHeld[dir] = true;
+          btn.classList.add("active");
+        }
+        function stopMove() {
+          state.keysHeld[dir] = false;
+          btn.classList.remove("active");
+        }
+        btn.addEventListener("mousedown", startMove);
+        btn.addEventListener("mouseup", stopMove);
+        btn.addEventListener("mouseleave", stopMove);
+        btn.addEventListener("touchstart", startMove, { passive: false });
+        btn.addEventListener("touchend", stopMove);
+        btn.addEventListener("touchcancel", stopMove);
+      });
+
+      // Tap / Click directly on canvas to walk character smoothly
+      canvas.addEventListener("pointerdown", function (e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        state.targetPos = {
+          x: (e.clientX - rect.left) * scaleX,
+          y: (e.clientY - rect.top) * scaleY
+        };
+      });
+
+      openNearbyBtn.addEventListener("click", function () {
+        if (state.nearbyMissionId && isMissionUnlocked(state.nearbyMissionId)) {
+          openMissionModal(state.nearbyMissionId);
+        }
+      });
+
+      function openMissionModal(missionId) {
+        state.keysHeld = { up: false, down: false, left: false, right: false };
+        state.activeMissionId = missionId;
+        const m = MISSIONS[missionId - 1];
+
+        modalSdtBadge.textContent = m.sdtLabel;
+        modalTitle.textContent = m.name;
+        modalLocation.textContent = "Campus Location: " + m.building + " • Reward: " + m.rewardLabel;
+        modalScenario.textContent = m.scenario;
+
+        modalHintBox.className = "hint-box";
+        modalHintBox.textContent = m.hint;
+
+        modalFeedbackBox.className = "feedback-box";
+        modalFeedbackBox.innerHTML = "";
+
+        checkTaskBtn.style.display = "inline-block";
+        finishMissionBtn.style.display = "none";
+        finishMissionBtn.textContent = "Collect Reward & Continue";
+        hintBtn.style.display = "inline-block";
+
+        renderMissionTask(m);
+        missionModal.classList.add("open");
+      }
+
+      function renderMissionTask(m) {
+        modalTaskArea.innerHTML = "";
+
+        if (m.id === 1) {
+          state.m1SelectedOrder = [];
+          const heading = document.createElement("p");
+          heading.className = "task-heading";
+          heading.textContent = "Task: Click the four assignment steps in logical order (1 to 4). Click a selected step again to undo.";
+          modalTaskArea.appendChild(heading);
+
+          const mixed = [m.steps[2], m.steps[0], m.steps[3], m.steps[1]];
+          const pool = document.createElement("div");
+          pool.className = "step-pool";
+
+          function refreshStepButtons() {
+            pool.innerHTML = "";
+            mixed.forEach(function (step) {
+              const idx = state.m1SelectedOrder.indexOf(step.id);
+              const btn = document.createElement("button");
+              btn.type = "button";
+              btn.className = "choice-btn" + (idx !== -1 ? " selected" : "");
+              const textSpan = document.createElement("span");
+              textSpan.textContent = step.text;
+              btn.appendChild(textSpan);
+
+              if (idx !== -1) {
+                const badge = document.createElement("span");
+                badge.className = "order-number";
+                badge.textContent = String(idx + 1);
+                btn.appendChild(badge);
+              }
+
+              btn.addEventListener("click", function () {
+                const existing = state.m1SelectedOrder.indexOf(step.id);
+                if (existing !== -1) {
+                  state.m1SelectedOrder.splice(existing, 1);
+                } else {
+                  state.m1SelectedOrder.push(step.id);
+                }
+                refreshStepButtons();
+              });
+              pool.appendChild(btn);
+            });
+          }
+
+          refreshStepButtons();
+          modalTaskArea.appendChild(pool);
+        } else if (m.id === 2) {
+          const heading = document.createElement("p");
+          heading.className = "task-heading";
+          heading.textContent = "Task: Match each Year One student difficulty with the appropriate university support unit:";
+          modalTaskArea.appendChild(heading);
+
+          m.matches.forEach(function (item) {
+            const row = document.createElement("div");
+            row.className = "match-row";
+            const lbl = document.createElement("label");
+            lbl.setAttribute("for", "select_" + item.id);
+            lbl.textContent = item.prompt;
+            const sel = document.createElement("select");
+            sel.id = "select_" + item.id;
+            sel.className = "select-input";
+            m.serviceOptions.forEach(function (opt) {
+              const o = document.createElement("option");
+              o.value = opt.value;
+              o.textContent = opt.label;
+              sel.appendChild(o);
+            });
+            row.appendChild(lbl);
+            row.appendChild(sel);
+            modalTaskArea.appendChild(row);
+          });
+        } else if (m.id === 3) {
+          state.m3SelectedOption = null;
+          const heading = document.createElement("p");
+          heading.className = "task-heading";
+          heading.textContent = "Task: Choose the most constructive and autonomy-supportive response:";
+          modalTaskArea.appendChild(heading);
+
+          const list = document.createElement("div");
+          list.className = "choice-list";
+          m.options.forEach(function (opt) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "choice-btn";
+            btn.textContent = opt.text;
+            btn.addEventListener("click", function () {
+              state.m3SelectedOption = opt.id;
+              list.querySelectorAll(".choice-btn").forEach(function (b) { b.classList.remove("selected"); });
+              btn.classList.add("selected");
+            });
+            list.appendChild(btn);
+          });
+          modalTaskArea.appendChild(list);
+        } else if (m.id === 4) {
+          state.m4SelectedPath = null;
+          const heading = document.createElement("p");
+          heading.className = "task-heading";
+          heading.textContent = "Task: Choose a realistic, personally meaningful first-semester pathway:";
+          modalTaskArea.appendChild(heading);
+
+          const list = document.createElement("div");
+          list.className = "choice-list";
+          m.pathways.forEach(function (p) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "choice-btn";
+            btn.textContent = p.text;
+            btn.addEventListener("click", function () {
+              state.m4SelectedPath = p.id;
+              list.querySelectorAll(".choice-btn").forEach(function (b) { b.classList.remove("selected"); });
+              btn.classList.add("selected");
+            });
+            list.appendChild(btn);
+          });
+          modalTaskArea.appendChild(list);
+        } else if (m.id === 5) {
+          const heading = document.createElement("p");
+          heading.className = "task-heading";
+          heading.textContent = "Task: Select one building block in each category to assemble your personal support plan:";
+          modalTaskArea.appendChild(heading);
+
+          m.planBlocks.forEach(function (block) {
+            const row = document.createElement("div");
+            row.className = "match-row";
+            const lbl = document.createElement("label");
+            lbl.setAttribute("for", "plan_" + block.id);
+            lbl.textContent = block.label;
+            const sel = document.createElement("select");
+            sel.id = "plan_" + block.id;
+            sel.className = "select-input";
+
+            const placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.textContent = "-- Select one option --";
+            sel.appendChild(placeholder);
+
+            block.choices.forEach(function (c, i) {
+              const o = document.createElement("option");
+              o.value = c;
+              o.textContent = c;
+              if (state.savedPlan && state.savedPlan[block.id] === c) {
+                o.selected = true;
+              }
+              sel.appendChild(o);
+            });
+            row.appendChild(lbl);
+            row.appendChild(sel);
+            modalTaskArea.appendChild(row);
+          });
+        }
+      }
+
+      hintBtn.addEventListener("click", function () {
+        if (!modalHintBox.classList.contains("visible")) {
+          state.hintsUsed += 1;
+          modalHintBox.classList.add("visible");
+        }
+      });
+
+      checkTaskBtn.addEventListener("click", function () {
+        const m = MISSIONS[state.activeMissionId - 1];
+        if (!m) return;
+
+        if (m.id === 1) {
+          if (state.m1SelectedOrder.length < 4) {
+            showGentleFeedback("Please select all four steps (1 to 4) before submitting.");
+            return;
+          }
+          const isCorrect = state.m1SelectedOrder.join(",") === "s1,s2,s3,s4";
+          if (!isCorrect) {
+            showGentleFeedback("Not quite in sequence yet—take your time! Think about reading the instructions and rubric first, then finding sources, outlining, and finally proofreading.");
+            return;
+          }
+          showSuccessFeedback(m.feedback, m.rewardLabel);
+        } else if (m.id === 2) {
+          let allSelected = true;
+          let allCorrect = true;
+          m.matches.forEach(function (item) {
+            const val = document.getElementById("select_" + item.id).value;
+            if (!val) allSelected = false;
+            if (val !== item.correct) allCorrect = false;
+          });
+          if (!allSelected) {
+            showGentleFeedback("Please select a campus support unit for all three cases (A, B, and C).");
+            return;
+          }
+          if (!allCorrect) {
+            showGentleFeedback("One or more matches can be adjusted. Check which office handles journal searching, persistent sleep/emotional anxiety, and course add/drop advising.");
+            return;
+          }
+          showSuccessFeedback(m.feedback, m.rewardLabel);
+        } else if (m.id === 3) {
+          if (!state.m3SelectedOption) {
+            showGentleFeedback("Please choose one message option above.");
+            return;
+          }
+          const chosen = m.options.find(function (o) { return o.id === state.m3SelectedOption; });
+          if (!chosen.isTarget) {
+            showGentleFeedback(chosen.gentleNote);
+            return;
+          }
+          showSuccessFeedback(m.feedback, m.rewardLabel);
+        } else if (m.id === 4) {
+          if (!state.m4SelectedPath) {
+            showGentleFeedback("Please select one university pathway above.");
+            return;
+          }
+          const chosenPath = m.pathways.find(function (p) { return p.id === state.m4SelectedPath; });
+          if (!chosenPath.balanced) {
+            showGentleFeedback(chosenPath.gentleNote);
+            return;
+          }
+          showSuccessFeedback(m.feedback, m.rewardLabel);
+        } else if (m.id === 5) {
+          const plan = {};
+          let complete = true;
+          m.planBlocks.forEach(function (block) {
+            const val = document.getElementById("plan_" + block.id).value;
+            if (!val) complete = false;
+            plan[block.id] = val;
+          });
+          if (!complete) {
+            showGentleFeedback("Please choose one option in each of the four categories to complete your First-Semester Support Plan.");
+            return;
+          }
+          state.savedPlan = plan;
+          const summaryHtml =
+            "<div>" + m.feedback + "</div>" +
+            "<div class='plan-summary-card'>" +
+            "<h4>Your Personalised First-Semester Support Plan</h4>" +
+            "<ul class='plan-summary-list'>" +
+            "<li><strong>Goal (Autonomy):</strong> " + plan.goal + "</li>" +
+            "<li><strong>Action (Competence):</strong> " + plan.action + "</li>" +
+            "<li><strong>Support (Relatedness):</strong> " + plan.support + "</li>" +
+            "<li><strong>Alternative Plan:</strong> " + plan.backup + "</li>" +
+            "</ul>" +
+            "</div>";
+          showSuccessFeedbackHtml(summaryHtml, m.rewardLabel);
+        }
+      });
+
+      function showGentleFeedback(msg) {
+        modalFeedbackBox.className = "feedback-box gentle visible";
+        modalFeedbackBox.textContent = msg;
+      }
+
+      function showSuccessFeedback(msg, reward) {
+        modalFeedbackBox.className = "feedback-box success visible";
+        modalFeedbackBox.innerHTML =
+          "<strong>✓ Mission Completed — Reward: " + reward + "</strong><p style='margin:6px 0 0;'>" + msg + "</p>";
+        checkTaskBtn.style.display = "none";
+        hintBtn.style.display = "none";
+        finishMissionBtn.style.display = "inline-block";
+      }
+
+      function showSuccessFeedbackHtml(htmlContent, reward) {
+        modalFeedbackBox.className = "feedback-box success visible";
+        modalFeedbackBox.innerHTML =
+          "<strong>🎉 Adventure Complete — Unlocked: " + reward + "</strong><div style='margin-top:6px;'>" + htmlContent + "</div>";
+        checkTaskBtn.style.display = "none";
+        hintBtn.style.display = "none";
+        finishMissionBtn.style.display = "inline-block";
+        finishMissionBtn.textContent = "Finish & Return to Campus";
+      }
+
+      finishMissionBtn.addEventListener("click", function () {
+        const id = state.activeMissionId;
+        if (id && !state.completed.includes(id)) {
+          state.completed.push(id);
+        }
+        finishMissionBtn.textContent = "Collect Reward & Continue";
+        missionModal.classList.remove("open");
+        updateHeaderAndSidebar();
+
+        if (state.nearbyMissionId === id) {
+          openNearbyBtn.disabled = false;
+          openNearbyBtn.textContent = "Review Mission " + id;
+        }
+
+        const nextId = state.completed.length < 5 ? state.completed.length + 1 : null;
+        if (nextId) {
+          const nextM = MISSIONS[nextId - 1];
+          proximityText.innerHTML = "Unlocked <strong>Mission " + nextM.id + " (" + nextM.building + ")</strong>! Walk there or tap the map.";
+        } else {
+          proximityText.innerHTML = "All 5 missions and all 3 SDT Keys unlocked! Open <strong>Programme Feedback &amp; Log</strong> to view evaluation items.";
+        }
+      });
+
+      closeMissionBtn.addEventListener("click", function () {
+        missionModal.classList.remove("open");
+      });
+
+      // Evaluation Modal Controls
+      document.getElementById("openEvalBtn").addEventListener("click", function () {
+        document.getElementById("statCompleted").textContent = state.completed.length + " / 5";
+        document.getElementById("statRate").textContent = Math.round((state.completed.length / 5) * 100) + "%";
+        document.getElementById("statHints").textContent = String(state.hintsUsed);
+        document.getElementById("evalSavedNotice").style.display = "none";
+        evalModal.classList.add("open");
+      });
+
+      document.getElementById("closeEvalBtn").addEventListener("click", function () {
+        evalModal.classList.remove("open");
+      });
+
+      document.querySelectorAll(".likert-options").forEach(function (group) {
+        const qKey = group.getAttribute("data-q");
+        group.querySelectorAll(".likert-btn").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            state.evalResponses[qKey] = btn.getAttribute("data-val");
+            group.querySelectorAll(".likert-btn").forEach(function (b) { b.classList.remove("selected"); });
+            btn.classList.add("selected");
+          });
+        });
+      });
+
+      document.getElementById("saveEvalBtn").addEventListener("click", function () {
+        state.evalResponses.reflection = document.getElementById("sdtReflectionInput").value.trim();
+        document.getElementById("evalSavedNotice").style.display = "block";
+      });
+
+      // Reset Demo button for repeated <30s class demonstrations
+      document.getElementById("resetGameBtn").addEventListener("click", function () {
+        state.player.x = 85;
+        state.player.y = 255;
+        state.targetPos = null;
+        state.completed = [];
+        state.hintsUsed = 0;
+        state.nearbyMissionId = null;
+        state.savedPlan = null;
+        proximityText.innerHTML = "Walk to <strong>1. Academic Building</strong> to start Mission 1: Assignment Rescue.";
+        openNearbyBtn.disabled = true;
+        openNearbyBtn.textContent = "Open Mission";
+        updateHeaderAndSidebar();
+      });
+
+      updateHeaderAndSidebar();
+      requestAnimationFrame(gameLoop);
+    })();
+  </script>
+</body>
+</html>
